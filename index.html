@@ -203,7 +203,7 @@ body[data-side="back"] .stage-wrap canvas{cursor:default}
             <div class="stamp-grid" id="stampGrid"></div>
             <div id="stampControls" class="done-tip" role="status">スタンプを選びました。裏面に大きく入りました。</div>
             <div id="stampEmpty" class="empty-select">好きなスタンプを１つ押してみてください。</div>
-            <button type="button" class="btn primary" id="nextOrder" style="display:block;width:100%;margin-top:14px">次へ　注文する →</button>
+
           </div>
         </div>
       </section>
@@ -465,7 +465,6 @@ function wire(){
   el('miniFront').onclick=()=>{ switchSide('front'); scrollToStage(); }; el('miniBack').onclick=()=>{ switchSide('back'); showBackPicker(); };
   el('nextBack').onclick=()=>{ switchSide('back'); showBackPicker(); };
   el('toggleMoreStamps').onclick=()=>{ const grid=el('moreStampGrid'), expanded=!grid.classList.contains('is-open'); grid.classList.toggle('is-open',expanded); el('toggleMoreStamps').setAttribute('aria-expanded',String(expanded)); el('toggleMoreStamps').textContent=expanded?'－ ほかのスタンプを閉じる':'＋ ほかのスタンプを見る（６種類）'; };
-  el('nextOrder').onclick=()=>el('orderPanel').scrollIntoView({behavior:'smooth',block:'start'});
   el('undoBtn').onclick=undo; el('redoBtn').onclick=redo;
   // capture属性つきの入力だけがカメラを直接開く。ライブラリ用にはcaptureを付けない。
   for(const [buttonId,inputId] of [['cameraStart','cameraInput'],['cameraEditor','cameraInput'],['libraryStart','photoInput'],['libraryEditor','photoInput']]){
