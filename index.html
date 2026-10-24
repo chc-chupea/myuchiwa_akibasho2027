@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2f1e14">
+<title>大相撲安芸場所巡業｜両面 Myうちわ</title>
+<style>
+:root{--ink:#2f261f;--brown:#4a2f1b;--brown2:#2f1e14;--gold:#d7a93a;--gold2:#f6e6b2;--bg:#faf7f1;--card:#ffffff;--border:#d9ccb5;--muted:#6b6258;--ok:#1d6b49;--rose:#fff4e7;--accent:#b2561a}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;font-size:18px;line-height:1.65}
+button,input,textarea,select{font:inherit} button{cursor:pointer} button:disabled{opacity:.5;cursor:not-allowed}
+.wrap{width:min(1160px,100% - 28px);margin:0 auto}
+header{background:linear-gradient(135deg,#24160f 0%,#59371d 55%,#3c2415 100%);color:#fff;padding:16px 0 18px;border-bottom:4px solid #c59c43;box-shadow:0 4px 18px rgba(0,0,0,.12)}
+header .eyebrow{font-size:12px;font-weight:800;letter-spacing:.16em;color:#f6deb1}
+header h1{margin:4px 0 4px;font-size:clamp(24px,4vw,34px);line-height:1.28;letter-spacing:.03em}
+header p{margin:0;font-size:16px;color:#fff7e5}
+.header-logo{display:block;max-width:min(540px,92%);margin:12px auto 0;height:auto}
+main{padding:14px 0 40px}
+.intro{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}
+.intro b{font-size:20px} .intro small{font-size:15px;color:var(--muted)}
+.layout{display:grid;grid-template-columns:minmax(0,1.22fr) minmax(340px,.92fr);gap:18px;align-items:start}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:0 10px 28px rgba(79,56,31,.07);overflow:hidden}
+.preview-panel{position:sticky;top:12px}
+.section-head{padding:16px 18px 12px;border-bottom:1px solid #efe4cf}
+.section-head h2{margin:0 0 4px;font-size:22px} .section-head p{margin:0;font-size:16px;color:var(--muted)}
+.tabs{display:flex;gap:8px;padding:12px 14px 5px}
+.tab{flex:1;min-height:62px;border-radius:13px;padding:8px 8px;border:2px solid #d6c4aa;background:#f8f0df;color:#523c2a;font-size:18px;font-weight:800}
+.tab[aria-selected="true"]{background:var(--brown2);color:#fff;border-color:var(--brown2);box-shadow:0 3px 10px rgba(54,32,20,.18)}
+.tab em{display:block;margin-top:2px;font-style:normal;font-size:12px;font-weight:600}
+.stage-wrap{margin:10px 12px 8px;border:2px solid #baa788;border-radius:16px;overflow:hidden;background:#fff;position:relative}
+.stage-wrap canvas{width:100%;height:auto;display:block;touch-action:none;cursor:grab;background:#fff}
+.stage-wrap canvas:active{cursor:grabbing}
+.stage-caption{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:0 14px 8px;font-size:16px;color:var(--muted)}
+.stage-caption b{font-size:14px;color:var(--brown);white-space:nowrap}
+.gesture-note{margin:0 12px 11px;padding:10px 12px;background:#fff6dd;color:#4f3a1f;border-radius:10px;font-weight:800;font-size:16px;text-align:center;line-height:1.5}
+.touch-tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:0 12px 12px}
+.touch-btn{border:2px solid #baaa92;border-radius:13px;min-height:62px;background:#fff;color:#4f3823;line-height:1.1;font-size:23px;font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px}
+.touch-btn span{font-size:14px;font-weight:800}
+.touch-btn:active{background:#f8efdf}
+.action-footer{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid #efe4cf;padding:10px 14px 14px}
+.action-footer button{flex:1}
+.mini-panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 12px 14px}
+.mini{border:1px solid #e9dfce;border-radius:13px;overflow:hidden;padding:8px;background:#fff;cursor:pointer}
+.mini strong{display:block;text-align:center;font-size:14px;color:var(--muted);margin-bottom:6px}
+.mini img{display:block;width:100%;border-radius:6px;background:#fff} .mini.active{outline:2px solid var(--brown)}
+.edit-body{padding:16px 18px 20px}
+.edit-block{display:none} .edit-block.active{display:block}
+.eyeline{font-size:17px;font-weight:900;color:var(--brown);margin-bottom:7px}
+.subhint{font-size:16px;color:var(--muted);line-height:1.65;margin:8px 0 14px}
+.upload-label{display:flex;justify-content:center;align-items:center;gap:10px;background:var(--brown2);color:#fff;border-radius:14px;padding:16px 12px;min-height:66px;font-size:22px;font-weight:900;box-shadow:0 2px 8px rgba(50,30,20,.2)}
+.upload-label input{display:none}
+.ctrlbox{border:1px solid #eadfcf;background:#fffaf0;border-radius:15px;padding:14px;margin-top:12px}
+.ctrlrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ctrlrow>button{flex:1;min-width:90px}
+.btn{min-height:54px;padding:12px 14px;font-size:17px;font-weight:800;border-radius:12px;border:2px solid #d7c7ae;background:#fff;color:#443326}
+.btn.primary{background:var(--brown);border-color:var(--brown);color:#fff}
+.btn.soft{background:#fff1db;border-color:#fff1db;color:#6a421f}
+.btn.danger{color:#a33352}
+.stamp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.stamp-btn{min-width:0;height:102px;border:2px solid #deceba;border-radius:14px;background:linear-gradient(#fff,#fffdf9);display:flex;align-items:center;justify-content:center;padding:6px;overflow:hidden;position:relative}
+.stamp-btn img{max-width:100%;max-height:100%;object-fit:contain} .stamp-btn span{position:absolute;bottom:2px;left:3px;right:3px;text-align:center;font-size:12px;font-weight:800;line-height:1.15;color:#4c3b2e;background:#fffef7e8;border-radius:8px;padding:2px 3px}
+.stamp-btn:active,.stamp-btn:focus-visible{border-color:var(--brown);outline:2px solid var(--brown);background:#fff9ef}
+.empty-select{color:var(--muted);font-size:15px;background:#fcf8f1;padding:12px;border-radius:10px;line-height:1.65}
+.done-tip{font-size:16px;font-weight:800;color:#315840;padding:10px 12px;border-radius:10px;background:#edf8f1;margin-top:10px;display:none}
+.order-panel{margin-top:18px}
+.order-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field label{display:block;font-size:17px;font-weight:800;margin:0 0 8px}
+.field input,.field select,.field textarea{width:100%;padding:12px;border:2px solid #b5a694;border-radius:10px;background:#fff;color:var(--ink);font-size:19px;min-height:56px}
+.total{margin:16px 0;background:#f9f0df;border-radius:14px;padding:14px 15px;color:#57381f;font-size:16px;line-height:1.7}
+.tiny,.note{font-size:15px;color:#5b534b;line-height:1.7}
+.note{border-left:4px solid #c69a46;background:#fffaf0;padding:11px 12px;border-radius:6px}
+.agree{display:flex;gap:8px;align-items:flex-start;font-size:17px;line-height:1.7;margin:15px 0} .agree input{margin-top:4px;accent-color:var(--brown);height:24px;width:24px;min-width:24px}
+.submit{display:block;width:100%;background:var(--brown2);border:0;border-radius:13px;color:white;font-weight:900;padding:17px 12px;font-size:21px;min-height:72px;box-shadow:0 3px 10px rgba(47,30,20,.23)}
+.status{font-size:17px;line-height:1.65;margin:12px 0 0;white-space:pre-wrap} .status.error{color:#b5293e} .status.success{color:var(--ok)}
+.complete{display:none;margin-top:15px;border-radius:14px;padding:18px;background:#ecf8f1;border:1px solid #c8ead6} .complete strong{display:block;font-size:24px;letter-spacing:.05em} .complete p{margin:7px 0;color:#2d694a;line-height:1.6}
+.footer{margin-top:24px;font-size:12px;color:#867c71;line-height:1.8;text-align:center}
+.visually-hidden-file{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;opacity:0!important;pointer-events:none!important}
+.photo-start,.back-start{display:none}
+.back-pick-status{margin:0 0 10px;color:#35614b;font-size:16px;font-weight:750;line-height:1.45;min-height:0}
+.back-more-btn{display:block;width:100%;min-height:54px;margin-top:10px;border:2px solid #c7b294;border-radius:13px;background:#fff;color:#52331f;font-size:17px;font-weight:900;padding:9px 12px}
+.back-start-heading{display:flex;align-items:center;gap:8px;justify-content:center;font-size:22px;font-weight:900;line-height:1.4;color:#492d1a;margin:0 0 5px}
+.back-start-lead{font-size:15px;line-height:1.5;color:#5b4d42;margin:0 0 10px;text-align:center}
+.back-more-grid{display:none} .back-more-grid.is-open{display:grid}
+.back-select-again{display:none}
+body[data-side="back"] .gesture-note, body[data-side="back"] .touch-tools{display:none}
+body[data-side="back"] .stage-wrap canvas{cursor:default}
+@media(max-width:900px){.layout{grid-template-columns:1fr} .preview-panel{position:static} .order-grid{grid-template-columns:1fr} }
+@media(max-width:870px){
+ header{padding:10px 0 12px} header .eyebrow{font-size:10px} header h1{font-size:22px;margin:3px 0} header p{font-size:14px}
+ .intro{display:none} main.wrap{padding-top:10px}
+ .photo-start{display:block;margin:0 0 10px;border:2px solid #d2b78e;border-radius:18px;background:#fff;box-shadow:0 6px 20px rgba(80,31,60,.08);padding:12px 13px 13px;text-align:center}
+ .photo-start-title{font-size:21px;font-weight:900;color:#492d1a;line-height:1.35;margin:0 0 6px}
+ .photo-start-hint{font-size:14px;color:#65584c;margin:0 0 10px;line-height:1.35}
+ .photo-start-label{display:flex;align-items:center;justify-content:center;gap:12px;border-radius:14px;background:#4a2f1b;color:#fff;min-height:76px;padding:13px 12px;font-size:24px;line-height:1.2;font-weight:900;border:3px solid #4a2f1b;box-shadow:0 4px 0 #29190f;cursor:pointer;user-select:none}
+ .photo-start-label:active{transform:translateY(2px);box-shadow:0 2px 0 #29190f}
+ .photo-start-symbol{font-size:32px;line-height:1;flex-shrink:0}
+ .photo-start-ready{display:none;color:#205b43;font-size:16px;font-weight:800;margin-bottom:7px}
+ .photo-start.is-ready{padding:10px 13px} .photo-start.is-ready .photo-start-title,.photo-start.is-ready .photo-start-hint{display:none} .photo-start.is-ready .photo-start-ready{display:block} .photo-start.is-ready .photo-start-label{min-height:52px;padding:8px 12px;font-size:18px;background:#fff;color:#4a2f1b;box-shadow:none;border:2px solid #b98b53} .photo-start.is-ready .photo-start-symbol{font-size:24px}
+ body[data-side="back"] .photo-start{display:none}
+ body[data-side="back"] .back-start{display:block;border:2px solid #d2b78e;border-radius:18px;background:#fff;box-shadow:0 6px 20px rgba(80,31,60,.08);padding:12px 12px 14px;margin:0 0 9px}
+ .back-start .stamp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0} .back-start .stamp-btn{height:98px;padding:5px 4px 30px} .back-start .stamp-btn span{font-size:12px;line-height:1.12;white-space:normal;max-height:32px;overflow:hidden}
+ body[data-side="back"] .back-select-again{display:block;margin:4px 10px 10px;width:calc(100% - 20px);min-height:50px;border:2px solid #be9dae;border-radius:12px;background:#fff8fc;font-size:17px;font-weight:800;color:#693452}
+ body[data-side="back"] .edit-panel .section-head, body[data-side="back"] #backEditor .eyeline, body[data-side="back"] #backEditor .subhint, body[data-side="back"] #backEditor #stampGrid, body[data-side="back"] #backEditor #stampControls, body[data-side="back"] #backEditor #stampEmpty{display:none!important}
+ .preview-panel .section-head{padding:11px 12px 7px;border-bottom:none} .preview-panel .section-head h2{font-size:17px;margin:0} .preview-panel .section-head p{display:none} .preview-panel .tabs{padding:5px 10px 0;gap:7px} .preview-panel .tab{min-height:52px;font-size:16px;padding:6px 6px;border-radius:10px} .preview-panel .tab em{font-size:11px;margin-top:0} .stage-wrap{margin:7px 10px 6px} .stage-caption{padding:0 12px 7px;font-size:14px}
+ .edit-panel .section-head{padding:12px 14px} .edit-body{padding:14px}
+ }
+@media(max-width:440px){ .wrap{width:calc(100% - 18px)} .stamp-btn{height:94px} .touch-tools{gap:6px} .touch-btn{min-height:60px;font-size:22px} .touch-btn span{font-size:13px} .section-head h2{font-size:20px} .field label{font-size:16px} }
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="eyebrow">令和8年 秋巡業</div>
+    <h1>大相撲安芸場所巡業</h1>
+    <p>記念写真で、オリジナルうちわをつくろう</p>
+    <img class="header-logo" id="headerLogo" src="../assets/akibashofilter.png" alt="大相撲安芸場所巡業 ロゴ">
+  </div>
+</header>
+<main class="wrap">
+  <input class="visually-hidden-file" id="photoInput" type="file" accept="image/*" aria-label="記念写真を選ぶ・撮る">
+  <section class="photo-start" id="photoStart" aria-label="最初に写真を選ぶ">
+    <h2 class="photo-start-title">① まず、記念写真を選びましょう</h2>
+    <p class="photo-start-hint">スマホにある写真を使えます</p>
+    <p class="photo-start-ready" id="photoStartReady" role="status">✓ 写真が入りました</p>
+    <label class="photo-start-label" for="photoInput" id="photoStartLabel">
+      <span class="photo-start-symbol" aria-hidden="true">📷</span>
+      <span id="photoStartAction">写真を選ぶ</span>
+    </label>
+  </section>
+
+  <section class="back-start" id="backStart" aria-label="裏面のスタンプを選ぶ">
+    <h2 class="back-start-heading">② 好きなスタンプを選ぶ</h2>
+    <p class="back-start-lead">押すだけで、裏面の中央に大きく入ります</p>
+    <p class="back-pick-status" id="backPickStatus" role="status" aria-live="polite"></p>
+    <div class="stamp-grid" id="quickStampGrid" aria-label="おすすめのスタンプ６種類"></div>
+    <div class="stamp-grid back-more-grid" id="moreStampGrid" aria-label="その他のスタンプ６種類"></div>
+    <button type="button" class="back-more-btn" id="toggleMoreStamps" aria-expanded="false" aria-controls="moreStampGrid">＋ ほかのスタンプを見る（６種類）</button>
+  </section>
+
+  <div class="intro"><b>思い出の写真で、巡業うちわを。</b><small>写真を選ぶ → スタンプを選ぶ → 注文する。それだけです。</small></div>
+
+  <div class="layout">
+    <section class="panel preview-panel" aria-label="うちわのプレビュー">
+      <div class="section-head"><h2>うちわの仕上がり</h2><p>表面は写真の位置や大きさを調整できます。裏面はスタンプを選ぶだけです。</p></div>
+      <div class="tabs">
+        <button type="button" class="tab" id="tabFront" aria-selected="true">① 表 <em>記念写真</em></button>
+        <button type="button" class="tab" id="tabBack" aria-selected="false">② 裏 <em>スタンプ</em></button>
+      </div>
+      <div class="stage-wrap"><canvas id="stage" width="1024" height="725" aria-label="うちわ編集キャンバス"></canvas></div>
+      <button type="button" class="back-select-again" id="backSelectAgain">＋ 別のスタンプも選ぶ</button>
+      <div class="stage-caption"><span id="stageHelp" role="status">写真を選ぶと、ここに表示されます。</span><b id="stageSide">表面</b></div>
+      <div class="gesture-note" id="gestureNote">☝️ １本指で動かす　✌️ ２本指で大きさ・回転</div>
+      <div class="touch-tools" id="touchTools" aria-label="指の操作が難しいときのボタン">
+        <button class="touch-btn" type="button" id="smallerBtn" aria-label="小さくする">－<span>小さく</span></button>
+        <button class="touch-btn" type="button" id="biggerBtn" aria-label="大きくする">＋<span>大きく</span></button>
+        <button class="touch-btn" type="button" id="rotateBtn" aria-label="少し回す">↻<span>回す</span></button>
+        <button class="touch-btn" type="button" id="resetThingBtn" aria-label="位置や大きさを元に戻す">↺<span id="resetThingLabel">元に戻す</span></button>
+      </div>
+      <div class="mini-panels">
+        <button type="button" id="miniFront" class="mini active"><strong>表面の仕上がり</strong><img id="frontThumb" alt="表面プレビュー"></button>
+        <button type="button" id="miniBack" class="mini"><strong>裏面の仕上がり</strong><img id="backThumb" alt="裏面プレビュー"></button>
+      </div>
+      <div class="action-footer"><button type="button" class="btn" id="undoBtn">↶ ひとつ戻す</button><button type="button" class="btn" id="redoBtn">↷ やり直す</button></div>
+    </section>
+
+    <div>
+      <section class="panel edit-panel" aria-label="デザイン編集">
+        <div class="section-head"><h2 id="editorTitle">① 記念写真を選ぶ</h2><p id="editorDesc">会場で撮った写真を選びましょう。</p></div>
+        <div class="edit-body">
+          <div class="edit-block active" id="frontEditor">
+            <label class="upload-label" for="photoInput">📷 写真を選ぶ・撮る</label>
+            <div class="subhint">写真を選んだら、上のうちわで位置を調整できます。<br>指２本の操作が難しいときは「大きく」「小さく」「回す」を押してください。</div>
+            <div class="ctrlbox">
+              <div class="eyeline">写真をきれいにする（お好みで）</div>
+              <div class="ctrlrow"><button type="button" class="btn primary" id="autoAdjust">✨ 写真をきれいに</button><button type="button" class="btn" id="adjustReset">補正を戻す</button></div>
+            </div>
+            <button type="button" class="btn primary" id="nextBack" style="display:block;width:100%;margin-top:14px">次へ　② スタンプを選ぶ →</button>
+          </div>
+
+          <div class="edit-block" id="backEditor">
+            <div class="eyeline">好きなスタンプを１つ選ぶ</div>
+            <div class="subhint">スタンプを押すと、裏面の中央に大きく入ります。<br>裏面は動かさず、スタンプの種類を選ぶイメージです。</div>
+            <div class="stamp-grid" id="stampGrid"></div>
+            <div id="stampControls" class="done-tip" role="status">スタンプを選びました。裏面に大きく入りました。</div>
+            <div id="stampEmpty" class="empty-select">好きなスタンプを１つ押してみてください。</div>
+            <button type="button" class="btn primary" id="nextOrder" style="display:block;width:100%;margin-top:14px">次へ　③ 注文する →</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel order-panel" id="orderPanel">
+        <div class="section-head"><h2>③ 注文する</h2><p>表と裏を確認して、注文する本数を選んでください。</p></div>
+        <div class="edit-body">
+          <div class="order-grid">
+            <div class="field"><label for="customerName">お名前（書かなくても大丈夫です）</label><input id="customerName" type="text" maxlength="30" autocomplete="nickname" placeholder="例：はなこ"></div>
+            <div class="field"><label for="copies">注文する本数</label><select id="copies"><option value="1">1 本</option><option value="2">2 本</option><option value="3">3 本</option><option value="4">4 本</option><option value="5">5 本</option><option value="6">6 本</option><option value="7">7 本</option><option value="8">8 本</option><option value="9">9 本</option><option value="10">10 本</option></select></div>
+          </div>
+          <div class="total">ご注文内容：<b>表面１デザイン＋裏面１デザイン</b> × <b id="quantityText">1本</b><div class="tiny">お支払いは会場スタッフの案内に従ってください。</div></div>
+          <div class="note">注文すると、写真とスタンプの印刷データがお店に送られます。お客様のスマホへの画像保存は不要です。<br><b>お渡し後の安心：</b>店舗が受け渡しを登録した24時間後を目安に、写真と注文情報を自動削除する仕組みです。※実際の自動削除には店舗側のFirebase設定が必要です。</div>
+          <label class="agree"><input type="checkbox" id="consent"> <span>写真をうちわの制作・注文受付に使うことに同意します。</span></label>
+          <button type="button" class="submit" id="orderBtn">注文を確定する</button>
+          <p id="orderStatus" class="status" role="status"></p>
+          <div class="complete" id="complete"><strong id="orderCode">受付番号</strong><p>注文データを送信しました。この番号を控えて、会場でお伝えください。</p><button type="button" class="btn" id="copyCode">受付番号をコピー</button></div>
+          <div class="tiny" style="margin-top:12px">お店では表面と裏面の２枚を印刷します。お客様が画像を保存する必要はありません。</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <footer class="footer">AKI BASHO FAN · Event edition ／ 個人情報はうちわの制作・受け渡しにのみ使用します。自動削除機能は店舗のFirebase設定後に有効になります。</footer>
+</main>
+
+<script>
+(()=>{
+'use strict';
+const CW=1024, CH=725, PRINT_W=3508, PRINT_H=2480;
+const ASSET_PATHS = {
+    headerLogo:'../assets/akibashofilter.png',
+    frontBase:'../assets/fan1-highres.png',
+    backBase:'../assets/fan-stamp.png',
+    frontMask:'../assets/fan-mask.png',
+    fanOutline:'../assets/fan-outline.png',
+    stamp01:'../assets/01loveu.png',
+    stamp02:'../assets/02ntwithFace.png',
+    stamp03:'../assets/03eyestome.png',
+    stamp04:'../assets/04getmyheart.png',
+    stamp05:'../assets/05angel.png',
+    stamp06:'../assets/06god.png',
+    stamp07:'../assets/07precious.png',
+    stamp08:'../assets/08osi_pink.png',
+    stamp09:'../assets/09osi_yellow.png',
+    stamp10:'../assets/10osi_lightblue.png',
+    stamp11:'../assets/11osi_green.png',
+    stamp12:'../assets/12nagekiss.png'
+};
+const resolveAsset = key => ASSET_PATHS[key] || key;
+const STAMPS = [
+  ['stamp01','大好きだよ'],['stamp02','顔が天才'],['stamp03','３秒見つめて'],['stamp04','撃って'],
+  ['stamp05','天使'],['stamp06','神'],['stamp07','尊い'],['stamp08','推し・ピンク'],
+  ['stamp09','推し・イエロー'],['stamp10','推し・ブルー'],['stamp11','推し・グリーン'],['stamp12','投げキッスして']
+];
+const HEADER_LOGO_KEY='headerLogo', FRONT_MASK_KEY='frontMask', FRONT_BASE_KEY='frontBase', FAN_OUTLINE_KEY='fanOutline', BACK_BASE_KEY='backBase';
+const el=id=>document.getElementById(id), stage=el('stage'), sc=stage.getContext('2d');
+const pics={}; let photoImage=null, side='front', stampId=1, selected=null, stamps=[];
+let photo={x:512,y:330,scale:1,angle:0,bright:1,sat:1,contrast:1};
+let backStack=[], frontStack=[], backRedo=[], frontRedo=[], pinches=new Map(), gesture=null, ready=false, lastOrderCode='';
+const stampsMeta={}; STAMPS.forEach(([key,label])=>stampsMeta[key]=label);
+const featured=['stamp01','stamp03','stamp07','stamp08','stamp12','stamp05'];
+
+function loadImage(src){
+  return new Promise((resolve,reject)=>{ const img=new Image(); img.onload=()=>resolve(img); img.onerror=()=>reject(new Error('画像が読み込めません: '+src)); img.src=resolveAsset(src); });
+}
+
+async function boot(){
+  try{
+    el('headerLogo').src = resolveAsset(HEADER_LOGO_KEY);
+    const entries = await Promise.all([HEADER_LOGO_KEY, FRONT_MASK_KEY, FRONT_BASE_KEY, FAN_OUTLINE_KEY, BACK_BASE_KEY, ...STAMPS.map(([k])=>k)].map(async key=>[key, await loadImage(key)]));
+    entries.forEach(([k,img])=>pics[k]=img);
+    ready=true; render(); updateThumbs();
+  }catch(e){
+    console.error(e); el('stageHelp').textContent='画像の準備に失敗しました。';
+  }
+}
+
+function snapshot(){ return side==='front' ? {...photo} : {stamps:stamps.map(s=>({...s})), selected}; }
+function saveUndo(){ const stack=side==='front'?frontStack:backStack, redo=side==='front'?frontRedo:backRedo; stack.push(snapshot()); if(stack.length>30)stack.shift(); redo.length=0; updateUndo(); }
+function applyState(value){ if(side==='front'){ photo={...value}; } else { stamps=value.stamps.map(s=>({...s})); selected=value.selected; updateStampControls(); } render(); updateThumbs(); updateTouchTools(); }
+function undo(){ const a=side==='front'?frontStack:backStack,b=side==='front'?frontRedo:backRedo; if(!a.length)return; b.push(snapshot()); applyState(a.pop()); updateUndo(); }
+function redo(){ const a=side==='front'?frontStack:backStack,b=side==='front'?frontRedo:backRedo; if(!b.length)return; a.push(snapshot()); applyState(b.pop()); updateUndo(); }
+function updateUndo(){ el('undoBtn').disabled=!(side==='front'?frontStack:backStack).length; el('redoBtn').disabled=!(side==='front'?frontRedo:backRedo).length; }
+
+function drawPhoto(ctx){
+  if(!photoImage){ ctx.fillStyle='#f1c343'; ctx.fillRect(0,0,CW,CH); return; }
+  ctx.save();
+  ctx.translate(photo.x,photo.y); ctx.rotate(photo.angle*Math.PI/180);
+  ctx.filter=`brightness(${photo.bright}) contrast(${photo.contrast}) saturate(${photo.sat})`;
+  const base=Math.max(980/photoImage.naturalWidth, 680/photoImage.naturalHeight);
+  const w=photoImage.naturalWidth*base*photo.scale, h=photoImage.naturalHeight*base*photo.scale;
+  ctx.drawImage(photoImage,-w/2,-h/2,w,h);
+  ctx.restore();
+}
+
+function computeStampBox(img){
+  const maxW=770, maxH=420;
+  const scale=Math.min(maxW/img.naturalWidth, maxH/img.naturalHeight);
+  return {w:img.naturalWidth*scale, h:img.naturalHeight*scale};
+}
+function currentStamp(){ return stamps.find(s=>s.id===selected) || null; }
+function drawStamps(ctx){
+  const s=currentStamp(); if(!s) return;
+  const img=pics[s.key]; if(!img) return;
+  const {w,h}=computeStampBox(img);
+  ctx.save(); ctx.translate(s.x,s.y); ctx.drawImage(img,-w/2,-h/2,w,h); ctx.restore();
+}
+
+const layerCache=new Map();
+function getLayer(outW,outH){
+  const key=outW+'x'+outH;
+  if(!layerCache.has(key)){ const c=document.createElement('canvas'); c.width=outW; c.height=outH; layerCache.set(key,c); }
+  return layerCache.get(key);
+}
+
+function drawFrontComposition(ctx,outW,outH){
+  ctx.save(); ctx.fillStyle='#fff'; ctx.fillRect(0,0,outW,outH);
+  const layer=getLayer(outW,outH), l=layer.getContext('2d');
+  l.setTransform(1,0,0,1,0,0); l.clearRect(0,0,outW,outH); l.setTransform(outW/CW,0,0,outH/CH,0,0);
+  drawPhoto(l);
+  l.filter='none'; l.globalCompositeOperation='destination-in'; l.drawImage(pics[FRONT_MASK_KEY],0,0,CW,CH); l.globalCompositeOperation='source-over';
+  ctx.drawImage(layer,0,0);
+  ctx.drawImage(pics[FRONT_BASE_KEY],0,0,outW,outH);
+  ctx.drawImage(pics[FAN_OUTLINE_KEY],0,0,outW,outH);
+  ctx.restore();
+}
+
+function drawBackComposition(ctx,outW,outH){
+  ctx.save(); ctx.fillStyle='#fff'; ctx.fillRect(0,0,outW,outH);
+  ctx.drawImage(pics[BACK_BASE_KEY],0,0,outW,outH);
+  if(currentStamp()){
+    const layer=getLayer(outW,outH), l=layer.getContext('2d');
+    l.setTransform(1,0,0,1,0,0); l.clearRect(0,0,outW,outH); l.setTransform(outW/CW,0,0,outH/CH,0,0);
+    drawStamps(l);
+    l.globalCompositeOperation='destination-in'; l.drawImage(pics[FRONT_MASK_KEY],0,0,CW,CH); l.globalCompositeOperation='source-over';
+    ctx.drawImage(layer,0,0);
+  }
+  ctx.drawImage(pics[FAN_OUTLINE_KEY],0,0,outW,outH);
+  ctx.restore();
+}
+
+function drawComposition(ctx,which,outW,outH){ if(which==='front') drawFrontComposition(ctx,outW,outH); else drawBackComposition(ctx,outW,outH); }
+function drawReceiptBand(ctx,outW,outH,displayCode){ if(!displayCode)return; ctx.save(); const scale=Math.min(outW/PRINT_W,outH/PRINT_H); const padX=32*scale,padY=16*scale; const font=Math.max(40*scale,15); ctx.font=`700 ${font}px system-ui,-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif`; const textW=ctx.measureText(displayCode).width; const bandH=font+padY*2, bandW=textW+padX*2; const x=Math.min(outW*0.66,outW*0.80-bandW), y=outH*0.80; ctx.fillStyle='rgba(255,255,255,0.90)'; ctx.fillRect(x,y,bandW,bandH); ctx.fillStyle='rgba(70,70,70,0.95)'; ctx.textBaseline='middle'; ctx.fillText(displayCode,x+padX,y+bandH/2); ctx.restore(); }
+function render(){ if(!ready)return; drawComposition(sc,side,CW,CH); }
+function makePrintCanvas(which,displayCode=''){ const c=document.createElement('canvas'); c.width=PRINT_W; c.height=PRINT_H; const cx=c.getContext('2d'); drawComposition(cx,which,PRINT_W,PRINT_H); drawReceiptBand(cx,PRINT_W,PRINT_H,displayCode); return c; }
+function updateThumbs(){ if(!ready)return; for(const which of ['front','back']){ const c=document.createElement('canvas'); c.width=440; c.height=311; drawComposition(c.getContext('2d'),which,c.width,c.height); el(which+'Thumb').src=c.toDataURL('image/jpeg',0.78); } }
+
+function switchSide(which){
+  if(!['front','back'].includes(which))return;
+  side=which; document.body.dataset.side=which;
+  ['Front','Back'].forEach(v=>{ const x=v.toLowerCase(); el('tab'+v).setAttribute('aria-selected', String(which===x)); el('mini'+v).classList.toggle('active', which===x); el(x+'Editor').classList.toggle('active', which===x); });
+  el('editorTitle').textContent = which==='front' ? '① 記念写真を選ぶ' : '② スタンプを選ぶ';
+  el('editorDesc').textContent = which==='front' ? '会場で撮った写真を選びましょう。' : '好きなスタンプを1つ選ぶだけです。';
+  el('stageSide').textContent = which==='front' ? '表面' : '裏面';
+  el('stageHelp').textContent = which==='front' ? (photoImage ? '写真を指で動かせます。' : 'まず写真を選んでください。') : (currentStamp() ? 'スタンプが中央に大きく入っています。' : '好きなスタンプを選んでください。');
+  updateUndo(); updateTouchTools(); render();
+}
+function updateTouchTools(){
+  const active = side==='front' && !!photoImage;
+  for(const id of ['smallerBtn','biggerBtn','rotateBtn','resetThingBtn']){ const b=el(id); if(b)b.disabled=!active; }
+  el('resetThingLabel').textContent='元に戻す';
+  el('resetThingBtn').setAttribute('aria-label','写真の位置と大きさを元に戻す');
+}
+function updateStampControls(){ const has=!!currentStamp(); el('stampControls').style.display=has?'block':'none'; el('stampEmpty').style.display=has?'none':'block'; }
+
+function addStamp(key){
+  if(!pics[key])return;
+  saveUndo();
+  const s={id:stampId++, key, x:512, y:292};
+  stamps=[s]; selected=s.id; updateStampControls();
+  const label=stampsMeta[key]||'スタンプ';
+  el('stageHelp').textContent='「'+label+'」を選びました。裏面の中央に大きく入りました。';
+  el('backPickStatus').textContent='✓ 「'+label+'」を選びました';
+  switchSide('back'); render(); updateThumbs();
+}
+
+function posFromEvent(e){ const rect=stage.getBoundingClientRect(); return {x:(e.clientX-rect.left)*CW/rect.width, y:(e.clientY-rect.top)*CH/rect.height}; }
+function dist(a,b){ return Math.hypot(a.x-b.x,a.y-b.y); }
+function angle(a,b){ return Math.atan2(b.y-a.y,b.x-a.x); }
+function clamp(v,min,max){ return Math.max(min, Math.min(max,v)); }
+
+function onPointerDown(e){
+  if(!ready || side!=='front' || !photoImage || (e.pointerType==='mouse' && e.button!==0))return;
+  const p=posFromEvent(e); stage.setPointerCapture(e.pointerId); pinches.set(e.pointerId,p);
+  if(pinches.size===1){ saveUndo(); gesture={kind:'drag', pointerId:e.pointerId, last:p}; }
+  else if(pinches.size===2){ const pts=[...pinches.values()]; gesture={kind:'pinch', scale:photo.scale, angle:photo.angle, x:photo.x, y:photo.y, midpoint:{x:(pts[0].x+pts[1].x)/2, y:(pts[0].y+pts[1].y)/2}, distance:Math.max(1,dist(pts[0],pts[1])), radians:angle(pts[0],pts[1])}; }
+}
+function onPointerMove(e){
+  if(side!=='front' || !pinches.has(e.pointerId) || !gesture)return;
+  const p=posFromEvent(e); pinches.set(e.pointerId,p);
+  if(gesture.kind==='pinch'){
+    if(pinches.size!==2)return; const ps=[...pinches.values()]; const midpoint={x:(ps[0].x+ps[1].x)/2, y:(ps[0].y+ps[1].y)/2};
+    photo.scale=clamp(gesture.scale*dist(ps[0],ps[1])/gesture.distance, .6, 3.5);
+    let radians=angle(ps[0],ps[1])-gesture.radians; if(radians>Math.PI)radians-=2*Math.PI; if(radians< -Math.PI)radians+=2*Math.PI;
+    photo.angle=gesture.angle+radians*180/Math.PI; photo.x=gesture.x+(midpoint.x-gesture.midpoint.x); photo.y=gesture.y+(midpoint.y-gesture.midpoint.y);
+  } else if(gesture.kind==='drag' && gesture.pointerId===e.pointerId && pinches.size===1){ photo.x+=p.x-gesture.last.x; photo.y+=p.y-gesture.last.y; gesture.last=p; }
+  render();
+}
+function onPointerUp(e){ const was=pinches.has(e.pointerId); pinches.delete(e.pointerId); if(was&&ready)updateThumbs(); gesture=null; try{stage.releasePointerCapture(e.pointerId)}catch{} }
+
+function easyScrollTo(id,block='start'){ el(id).scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth', block}); }
+function scrollToStage(){ easyScrollTo('stage','center'); }
+function showBackPicker(){ if(window.matchMedia('(max-width:870px)').matches) easyScrollTo('backStart','start'); else scrollToStage(); }
+
+async function onPhotoSelected(e){
+  const file=e.target.files?.[0]; if(!file)return;
+  if(!file.type.startsWith('image/')){ alert('画像ファイルを選択してください。'); e.target.value=''; return; }
+  if(file.size>30*1024*1024){ alert('画像は30MB以下を選択してください。'); e.target.value=''; return; }
+  const objectURL=URL.createObjectURL(file);
+  try{
+    const img=await loadImage(objectURL); photoImage=img;
+    photo={x:512,y:330,scale:1,angle:0,bright:1,sat:1,contrast:1};
+    frontStack=[]; frontRedo=[]; switchSide('front'); updateUndo(); updateTouchTools();
+    el('stageHelp').textContent='写真が入りました。指で動かせます。';
+    el('photoStart').classList.add('is-ready'); el('photoStartAction').textContent='写真を選び直す';
+    render(); updateThumbs(); scrollToStage();
+  }catch{ alert('写真を開けませんでした。別の画像を選んでください。'); }
+  finally{ URL.revokeObjectURL(objectURL); e.target.value=''; }
+}
+async function toPngBlob(c){ return await new Promise((resolve,reject)=>c.toBlob(blob=>blob?resolve(blob):reject(new Error('画像を書き出せませんでした')),'image/png')); }
+function status(s,kind=''){ const x=el('orderStatus'); x.textContent=s; x.className='status '+kind; }
+const queryParams=new URLSearchParams(location.search); const shopId=(queryParams.get('shop')||'aki-basho').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,40)||'aki-basho';
+const firebaseConfig={apiKey:'AIzaSyBKSYZgaSVTu-HO_lS1Tp2eFjSjMuOONNI',authDomain:'my-uchiwa-queue.firebaseapp.com',projectId:'my-uchiwa-queue',storageBucket:'my-uchiwa-queue.firebasestorage.app',messagingSenderId:'245883628081',appId:'1:245883628081:web:ab7f00f01ba256ebca8310'};
+let firebase=null;
+async function getFirebase(){ if(firebase)return firebase; const [appmod,fs,st]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js'), import('https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js'), import('https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js')]); const app=appmod.getApps().length?appmod.getApp():appmod.initializeApp(firebaseConfig); firebase={db:fs.getFirestore(app),storage:st.getStorage(app),fs,st}; return firebase; }
+function dayKey(){ const d=new Date(); return [String(d.getFullYear()).slice(-2), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join(''); }
+function timeout(p,ms,name){ return Promise.race([p,new Promise((_,reject)=>setTimeout(()=>reject(new Error(name+'が時間切れです。通信状況を確認してください。')),ms))]); }
+
+async function sendOrder(){
+  if(!ready){ status('画像の準備が終わっていません。','error'); return; }
+  if(!photoImage){ switchSide('front'); status('① まず表面の記念写真を選んでください。','error'); el('photoInput').focus(); return; }
+  if(!currentStamp()){ switchSide('back'); status('② 裏面のスタンプを１つ選んでください。','error'); el('stageHelp').textContent='スタンプを１つ選んでください。'; return; }
+  if(!el('consent').checked){ status('写真の利用について同意欄にチェックしてください。','error'); return; }
+  const btn=el('orderBtn'); btn.disabled=true; btn.textContent='注文データを送信中…'; el('complete').style.display='none';
+  try{
+    status('受付番号を発行しています…');
+    const {db,storage,fs,st}=await getFirebase(); const date=dayKey(), counterRef=fs.doc(db,'counters',shopId+'_'+date);
+    const serial=await timeout(fs.runTransaction(db,async tx=>{ const snap=await tx.get(counterRef), n=(snap.exists()?Number(snap.data().lastNumber)||0:0)+1; tx.set(counterRef,{shopId,dayKey:date,lastNumber:n,updatedAt:fs.serverTimestamp()},{merge:true}); return n; }),30000,'受付番号発行');
+    const shortId=String(serial).padStart(4,'0'), queueId=shopId+'-'+date+'-'+shortId, displayCode='AK'+date.slice(2)+'-'+shortId;
+    status('両面の印刷データを作成しています…'); const fcan=makePrintCanvas('front',displayCode), fblob=await toPngBlob(fcan); const bcan=makePrintCanvas('back',displayCode), bblob=await toPngBlob(bcan);
+    const folder=`orders/${shopId}/${date}`, frontPath=`${folder}/${queueId}.png`, backPath=`${folder}/${queueId}_back.png`;
+    status('表面の写真を送信しています…'); const fr=st.ref(storage,frontPath); await timeout(st.uploadBytes(fr,fblob,{contentType:'image/png'}),90000,'表面の送信'); const imageUrl=await st.getDownloadURL(fr);
+    status('裏面のスタンプを送信しています…'); const br=st.ref(storage,backPath); await timeout(st.uploadBytes(br,bblob,{contentType:'image/png'}),90000,'裏面の送信'); const backImageUrl=await st.getDownloadURL(br);
+    status('注文を確定しています…'); const orderRef=fs.doc(db,'orders',queueId); await timeout(fs.setDoc(orderRef,{source:'aki-basho-double-fan',productType:'double-sided-fan',doubleSided:true,queueId,shortId,displayNo:serial,displayCode,shopId,shopName:'大相撲安芸場所巡業',shopCode:'AK',dayKey:date,customerName:el('customerName').value.trim(),copies:Number(el('copies').value),imageUrl,frontImageUrl:imageUrl,backImageUrl,storagePath:frontPath,backStoragePath:backPath,template:'aki-front',backTemplate:'aki-back',stampCount:currentStamp()?1:0,priceType:'event',unitPrice:null,totalPrice:null,status:'WAIT',retentionPolicy:'pickup-plus-24h',createdAt:fs.serverTimestamp(),updatedAt:fs.serverTimestamp()}),30000,'注文確定');
+    lastOrderCode=displayCode; el('orderCode').textContent='受付番号 '+displayCode; el('complete').style.display='block'; status('注文が完了しました。表面・裏面の右下に同じ受付番号を入れました。','success'); el('complete').scrollIntoView({behavior:'smooth',block:'center'});
+  }catch(e){ console.error(e); status('注文はまだ確定していません。\n'+(e.code==='permission-denied'?'Firebaseの権限設定により送信できません。管理者にご連絡ください。':e.message||'通信エラーが発生しました。')+'\n再送信の前に、受付側で注文の有無を確認してください。','error'); }
+  finally{ btn.disabled=false; btn.textContent='注文を確定する'; }
+}
+
+function changeSize(factor){ if(side!=='front' || !photoImage)return; saveUndo(); photo.scale=clamp(photo.scale*factor,.6,3.5); render(); updateThumbs(); }
+function rotateTarget(){ if(side!=='front' || !photoImage)return; saveUndo(); photo.angle=(photo.angle+15)%360; render(); updateThumbs(); }
+function resetTarget(){ if(side!=='front' || !photoImage)return; saveUndo(); Object.assign(photo,{x:512,y:330,scale:1,angle:0}); render(); updateThumbs(); }
+
+function wire(){
+  el('tabFront').onclick=()=>switchSide('front'); el('tabBack').onclick=()=>{ switchSide('back'); showBackPicker(); };
+  el('miniFront').onclick=()=>{ switchSide('front'); scrollToStage(); }; el('miniBack').onclick=()=>{ switchSide('back'); showBackPicker(); };
+  el('nextBack').onclick=()=>{ switchSide('back'); showBackPicker(); }; el('backSelectAgain').onclick=showBackPicker;
+  el('toggleMoreStamps').onclick=()=>{ const grid=el('moreStampGrid'), expanded=!grid.classList.contains('is-open'); grid.classList.toggle('is-open',expanded); el('toggleMoreStamps').setAttribute('aria-expanded',String(expanded)); el('toggleMoreStamps').textContent=expanded?'－ ほかのスタンプを閉じる':'＋ ほかのスタンプを見る（６種類）'; };
+  el('nextOrder').onclick=()=>el('orderPanel').scrollIntoView({behavior:'smooth',block:'start'});
+  el('undoBtn').onclick=undo; el('redoBtn').onclick=redo;
+  el('photoInput').addEventListener('change', onPhotoSelected);
+  el('smallerBtn').onclick=()=>changeSize(0.86); el('biggerBtn').onclick=()=>changeSize(1.16); el('rotateBtn').onclick=rotateTarget; el('resetThingBtn').onclick=resetTarget;
+  el('autoAdjust').onclick=()=>{ if(!photoImage)return; saveUndo(); photo.bright=1.10; photo.sat=1.16; photo.contrast=1.08; render(); updateThumbs(); };
+  el('adjustReset').onclick=()=>{ if(!photoImage)return; saveUndo(); photo.bright=photo.sat=photo.contrast=1; render(); updateThumbs(); };
+  const makeStampButton=(key,label)=>{ const b=document.createElement('button'); b.className='stamp-btn'; b.type='button'; b.title=label; b.setAttribute('aria-label', label+'を選ぶ'); const im=document.createElement('img'); im.src=resolveAsset(key); im.alt=''; const tag=document.createElement('span'); tag.textContent=label; b.append(im,tag); b.onclick=()=>addStamp(key); return b; };
+  for(const [key,label] of STAMPS){ el('stampGrid').append(makeStampButton(key,label)); el(featured.includes(key)?'quickStampGrid':'moreStampGrid').append(makeStampButton(key,label)); }
+  stage.addEventListener('pointerdown',onPointerDown); stage.addEventListener('pointermove',onPointerMove); stage.addEventListener('pointerup',onPointerUp); stage.addEventListener('pointercancel',onPointerUp); stage.addEventListener('lostpointercapture',onPointerUp);
+  el('copies').onchange=()=>el('quantityText').textContent=el('copies').value+'本';
+  el('orderBtn').onclick=sendOrder;
+  el('copyCode').onclick=async()=>{ try{ await navigator.clipboard.writeText(lastOrderCode); el('copyCode').textContent='コピーしました'; }catch{ el('copyCode').textContent='受付番号: '+lastOrderCode; } };
+  updateUndo(); updateStampControls(); updateTouchTools();
+}
+
+wire(); boot();
+})();
+</script>
+</body>
+</html>

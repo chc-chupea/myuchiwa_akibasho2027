@@ -1,0 +1,62 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>大相撲安芸場所巡業｜Myうちわ 受付管理</title><style>
+:root{
+  font-family:system-ui,-apple-system,"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;
+  color:#2c241e;background:#f9f6f0;
+  --accent:#9b3f24;--ink:#2c241e;--border:#ded2c3;--brown:#37251c;--gold:#d6ac67;
+}
+*{box-sizing:border-box}
+body{margin:0;font-size:16px;line-height:1.5}
+header{background:linear-gradient(120deg,#241913,#513322 75%,#3d291d);color:#fff;border-bottom:4px solid #cda25e}
+header .wrap{max-width:1200px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+header h1{font-size:clamp(20px,3vw,26px);margin:0 0 4px;font-weight:850}
+header span{font-size:14px;color:#f2e1c5}
+header img{width:min(310px,100%);height:auto;object-fit:contain}
+.wrap{max-width:1200px;margin:0 auto;padding:20px}
+.login{max-width:470px;margin:6vh auto;padding:26px;border:1px solid var(--border);border-radius:17px;background:white;box-shadow:0 7px 22px #38281d0d}
+.login label{display:block;font-size:16px;margin:14px 0 6px;font-weight:800}
+input{font:inherit;width:100%;padding:13px;border:2px solid #baa891;border-radius:10px;min-height:52px}
+button{font:inherit;border-radius:10px;padding:11px 15px;border:2px solid #bdae9f;background:#fff;color:#493324;cursor:pointer;font-weight:800;min-height:49px}
+button:hover{border-color:var(--accent)}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #d6ac67;outline-offset:2px}
+button.primary{background:#603321;color:white;border-color:#603321}
+button:disabled{opacity:.55;cursor:not-allowed}
+h2{font-size:22px}
+.muted{color:#6b5f55;font-size:14px;line-height:1.6}
+.err{color:#ad2838;font-size:15px;white-space:pre-wrap}
+.toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:0 0 18px}
+.toolbar select{font:inherit;padding:11px;border:2px solid #c8b5a1;border-radius:10px;min-height:49px;background:white}
+.orders{display:grid;gap:15px}
+.order{background:#fff;padding:18px;border:1px solid #dfd4c5;border-radius:15px;box-shadow:0 3px 10px #4d362008}
+.top{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+.code{font-size:24px;font-weight:900;color:#66341e;letter-spacing:.02em}
+.status{font-size:14px;background:#f9ecd4;border:1px solid #e8d3ad;border-radius:22px;padding:6px 13px;font-weight:800}
+.images{display:grid;grid-template-columns:1fr 1fr;gap:11px;max-width:720px;margin:14px 0}
+.images figure{margin:0;border-radius:10px;overflow:hidden;border:1px solid #e7ddd1;padding:6px;background:#fff}
+.images figcaption{text-align:center;font-size:15px;font-weight:800;margin:5px}
+.images img{width:100%;display:block;aspect-ratio:1024/725;object-fit:contain;background:white}
+.actions{display:flex;flex-wrap:wrap;gap:9px}.actions button{font-size:15px}
+.help{padding:14px;border-left:4px solid #ba8048;border-radius:8px;background:white;color:#5e4d3c;font-size:15px;line-height:1.7;margin-bottom:18px}
+.count{color:#766454}
+.hidden{display:none}
+@media(max-width:600px){header .wrap{padding:12px;gap:8px}header img{max-width:240px}.wrap{padding:12px}.login{margin:4vh auto;padding:18px}.images{gap:7px}.order{padding:13px}.actions button{flex:1;min-width:145px}}
+</style></head><body><header><div class="wrap"><div><h1>大相撲安芸場所巡業｜うちわ受付管理</h1><span>表・裏のA4横印刷 ／ 受付・受け渡し</span></div><img src="../assets/akibashofilter.png" alt="令和8年 秋巡業 大相撲安芸場所巡業" loading="lazy"></div></header>
+<div class="wrap"><div id="login" class="login"><h2>スタッフログイン</h2><p class="muted">Firebase Authenticationのスタッフ用メールアドレスでログインしてください。安芸場所の注文だけを表示します。閲覧・更新の権限はFirebaseのセキュリティルールでも許可されている必要があります。</p><label>メールアドレス<input id="email" type="email" autocomplete="username"></label><label>パスワード<input id="password" type="password" autocomplete="current-password"></label><p><button type="button" id="loginBtn" class="primary">ログイン</button></p><p id="loginError" class="err"></p></div>
+<div id="dashboard" class="hidden"><div class="toolbar"><div><h2 style="margin:0">注文一覧 <span class="count" id="count"></span></h2><div class="muted">会場ID: <span id="shopName"></span></div></div><div><select id="filter"><option value="ALL">全件</option><option value="WAIT">未印刷</option><option value="READY">印刷済み</option><option value="DONE">受渡済み</option></select> <button id="refresh">再読み込み</button> <button id="logout">ログアウト</button></div></div>
+<div class="help"><b>受渡後の削除：</b>商品をお渡しした後、「受渡済みにする」を押してください。受渡日時を記録します。受渡から24時間経過後の画像・注文情報の自動削除は、<b>Firebase側の削除処理が正しく設定・稼働している場合に限ります。</b>受渡前には押さないでください。<br><b>印刷方法：</b>「表・裏を２ページで印刷」を押すとA4横の２ページが開きます。表と裏を別々に印刷する場合は各ボタンを使用してください。実際の貼り合わせ方向は印刷テストでご確認ください。</div><p id="message" class="err"></p><div id="orders" class="orders"></div></div></div>
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
+import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
+import {getFirestore,collection,query,where,limit,getDocs,doc,updateDoc,serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+const config={apiKey:'AIzaSyBKSYZgaSVTu-HO_lS1Tp2eFjSjMuOONNI',authDomain:'my-uchiwa-queue.firebaseapp.com',projectId:'my-uchiwa-queue',storageBucket:'my-uchiwa-queue.firebasestorage.app',messagingSenderId:'245883628081',appId:'1:245883628081:web:ab7f00f01ba256ebca8310'};
+const app=initializeApp(config),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
+const shopId=(new URLSearchParams(location.search).get('shop')||'aki-basho').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,40)||'aki-basho';$('shopName').textContent=shopId;
+let orders=[],loading=false;
+$('loginBtn').onclick=async()=>{const button=$('loginBtn');button.disabled=true;$('loginError').textContent='';try{await signInWithEmailAndPassword(auth,$('email').value.trim(),$('password').value)}catch(e){$('loginError').textContent='ログインできませんでした。'+e.message}finally{button.disabled=false}};
+$('logout').onclick=()=>signOut(auth);$('refresh').onclick=loadOrders;$('filter').onchange=render;
+onAuthStateChanged(auth,async user=>{$('login').classList.toggle('hidden',!!user);$('dashboard').classList.toggle('hidden',!user);if(user)await loadOrders();else{orders=[];$('orders').replaceChildren()}});
+async function loadOrders(){if(loading||!auth.currentUser)return;loading=true;$('message').textContent='';try{const qs=query(collection(db,'orders'),where('shopId','==',shopId),limit(500));const snap=await getDocs(qs);orders=snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.shopId===shopId && x.source==='aki-basho-double-fan' && x.doubleSided===true).sort((a,b)=>b.id.localeCompare(a.id));render()}catch(e){$('message').textContent='注文一覧の取得に失敗しました。\n'+e.message+'\nFirestoreの権限設定を確認してください。'}finally{loading=false}}
+function render(){const area=$('orders');area.replaceChildren();const show=$('filter').value;const data=orders.filter(o=>show==='ALL'||(o.status||'WAIT')===show);$('count').textContent=`${data.length}件`;
+if(!data.length){area.textContent='該当する注文はありません。';return}for(const o of data){const card=document.createElement('article');card.className='order';const top=document.createElement('div');top.className='top';const left=document.createElement('div');const code=document.createElement('div');code.className='code';code.textContent=o.displayCode||o.shortId||o.id;const detail=document.createElement('div');detail.className='muted';detail.textContent=`${o.customerName||'お名前未入力'} ／ ${o.copies||1}本 ／ ${o.dayKey||''}`;left.append(code,detail);if(o.status==='DONE'){const timing=document.createElement('div');timing.className='muted';timing.textContent=o.handedOverAt?.toDate?'受渡登録：'+o.handedOverAt.toDate().toLocaleString('ja-JP')+' ／ 24時間後を過ぎると自動削除':'受渡日時が未登録です（削除対象になりません）';left.append(timing)}const status=document.createElement('span');status.className='status';status.textContent=({WAIT:'未印刷',READY:'印刷済',DONE:'受渡済'})[o.status]||o.status||'受付済';top.append(left,status);card.append(top);
+const figs=document.createElement('div');figs.className='images';for(const [which,url] of [['表面',o.frontImageUrl||o.imageUrl],['裏面',o.backImageUrl]]){const f=document.createElement('figure');const img=document.createElement('img');if(url){img.src=url;img.alt=which}else img.alt=which+'画像なし';img.loading='lazy';const cap=document.createElement('figcaption');cap.textContent=which;f.append(img,cap);figs.append(f)}card.append(figs);
+const actions=document.createElement('div');actions.className='actions';for(const [label,sides] of [['表・裏を２ページで印刷',['front','back']],['表面だけ印刷',['front']],['裏面だけ印刷',['back']]]){const b=document.createElement('button');b.textContent=label;b.disabled=sides.some(v=>!(v==='front'?(o.frontImageUrl||o.imageUrl):o.backImageUrl));b.onclick=()=>printOrder(o,sides);actions.append(b)}if(o.status!=='DONE')for(const [label,value] of [['印刷済みにする','READY'],['受渡済みにする','DONE']]){if(value==='READY'&&o.status==='READY')continue;const b=document.createElement('button');b.textContent=label;if(value==='DONE')b.classList.add('primary');b.onclick=async()=>{if(value==='DONE'&&!confirm('この商品をお客様にお渡ししましたか？\n「OK」を押した時刻から24時間後、表裏の写真と注文情報が自動削除の対象になります。\n※受渡前は押さないでください。'))return;b.disabled=true;try{const payload={status:value,updatedAt:serverTimestamp()};if(value==='DONE')payload.handedOverAt=serverTimestamp();await updateDoc(doc(db,'orders',o.id),payload);await loadOrders();}catch(e){$('message').textContent='状態更新に失敗しました。'+e.message}finally{b.disabled=false}};actions.append(b)}if(o.status==='DONE'&&!o.handedOverAt){const b=document.createElement('button');b.textContent='受渡日時を今から登録';b.className='primary';b.onclick=async()=>{if(!confirm('この注文は以前から受渡済みですが日時がありません。\n今から24時間の削除期限を設定してよろしいですか？'))return;b.disabled=true;try{await updateDoc(doc(db,'orders',o.id),{handedOverAt:serverTimestamp(),updatedAt:serverTimestamp()});await loadOrders()}catch(e){$('message').textContent='日時登録に失敗しました。'+e.message}finally{b.disabled=false}};actions.append(b)}card.append(actions);area.append(card)}}
+function printOrder(o,sides){const w=window.open('','_blank');if(!w){alert('ポップアップを許可してください。');return}const images=sides.map(side=>({name:side==='front'?'表面':'裏面',url:side==='front'?(o.frontImageUrl||o.imageUrl):o.backImageUrl}));const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));w.document.open();w.document.write(`<!DOCTYPE html><html lang="ja"><head><title>${esc(o.displayCode||o.id)} - 印刷</title><style>@page{size:A4 landscape;margin:0}html,body{margin:0;padding:0;background:white}.page{height:210mm;width:297mm;page-break-after:always;break-after:page;display:flex;align-items:center;justify-content:center}.page:last-child{page-break-after:auto;break-after:auto}img{width:297mm;height:210mm;object-fit:contain;display:block}@media screen{body{background:#ddd}.page{background:white;margin:8mm auto;box-shadow:0 0 10px #999}}</style></head><body>${images.map(x=>`<section class="page"><img src="${esc(x.url)}" alt="${x.name}"></section>`).join('')}<script>Promise.all(Array.from(document.images).map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve}))).then(()=>setTimeout(()=>window.print(),400));<\/script></body></html>`);w.document.close()}
+</script></body></html>
