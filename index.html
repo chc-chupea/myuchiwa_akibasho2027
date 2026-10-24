@@ -106,6 +106,27 @@ body[data-side="back"] .stage-wrap canvas{cursor:default}
  }
 @media(max-width:440px){ .wrap{width:calc(100% - 18px)} .stamp-btn{height:94px} .touch-tools{gap:6px} .touch-btn{min-height:60px;font-size:22px} .touch-btn span{font-size:13px} .section-head h2{font-size:20px} .field label{font-size:16px} }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important}}
+
+/* 2027安芸場所：カメラ・ライブラリ2択の大型ボタン */
+.photo-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.photo-action{min-width:0;min-height:71px;display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:12px 8px;border:2px solid #4a2f1b;border-radius:13px;background:#4a2f1b;
+  color:#fff;font-size:17px;font-weight:850;line-height:1.25;text-align:center;overflow-wrap:anywhere}
+.photo-action:nth-child(2){background:#fff;color:#4a2f1b;border-color:#a77d47}
+.photo-action:focus-visible{outline:4px solid #d3b163;outline-offset:3px}
+.photo-action:active{transform:translateY(1px)}
+.photo-action-icon{font-size:22px;line-height:1;flex-shrink:0}
+.photo-actions-editor{margin-bottom:11px}
+@media(max-width:870px){
+  .photo-start .photo-actions{margin-top:8px}
+  .photo-start.is-ready .photo-actions{margin-top:4px}
+  .photo-start.is-ready .photo-action{min-height:57px;font-size:16px}
+  .photo-action{font-size:16px;padding:11px 6px;gap:5px;min-height:70px}
+  .photo-action-icon{font-size:20px}
+}
+@media(max-width:360px){.photo-action{font-size:15px}.photo-action-icon{font-size:19px}}
+/* スマホではおすすめ6つだけを表示。残り6つは展開後に表示する */
+@media(max-width:870px){.back-start .back-more-grid:not(.is-open){display:none}}
 </style>
 </head>
 <body>
@@ -118,20 +139,21 @@ body[data-side="back"] .stage-wrap canvas{cursor:default}
   </div>
 </header>
 <main class="wrap">
-  <input class="visually-hidden-file" id="photoInput" type="file" accept="image/*" aria-label="記念写真を選ぶ・撮る">
+  <input class="visually-hidden-file" id="cameraInput" type="file" accept="image/*" capture="environment" aria-label="カメラで写真を撮影">
+  <input class="visually-hidden-file" id="photoInput" type="file" accept="image/*" aria-label="ライブラリの写真を選択">
   <section class="photo-start" id="photoStart" aria-label="最初に写真を選ぶ">
     <h2 class="photo-start-title">① まず、記念写真を選びましょう</h2>
-    <p class="photo-start-hint">スマホにある写真を使えます</p>
+    <p class="photo-start-hint">いま撮る・撮った写真から選ぶ</p>
     <p class="photo-start-ready" id="photoStartReady" role="status">✓ 写真が入りました</p>
-    <label class="photo-start-label" for="photoInput" id="photoStartLabel">
-      <span class="photo-start-symbol" aria-hidden="true">📷</span>
-      <span id="photoStartAction">写真を選ぶ</span>
-    </label>
+    <div class="photo-actions" role="group" aria-label="写真の入れ方">
+      <button type="button" class="photo-action" id="cameraStart"><span class="photo-action-icon" aria-hidden="true">📷</span>カメラを起動</button>
+      <button type="button" class="photo-action" id="libraryStart"><span class="photo-action-icon" aria-hidden="true">▣</span>ライブラリの写真を選択</button>
+    </div>
   </section>
 
   <section class="back-start" id="backStart" aria-label="裏面のスタンプを選ぶ">
     <h2 class="back-start-heading">② 好きなスタンプを選ぶ</h2>
-    <p class="back-start-lead">押すだけで、裏面の中央に大きく入ります</p>
+    <p class="back-start-lead">押すだけで、裏面の中央より少し下に大きく入ります</p>
     <p class="back-pick-status" id="backPickStatus" role="status" aria-live="polite"></p>
     <div class="stamp-grid" id="quickStampGrid" aria-label="おすすめのスタンプ６種類"></div>
     <div class="stamp-grid back-more-grid" id="moreStampGrid" aria-label="その他のスタンプ６種類"></div>
@@ -144,8 +166,8 @@ body[data-side="back"] .stage-wrap canvas{cursor:default}
     <section class="panel preview-panel" aria-label="うちわのプレビュー">
       <div class="section-head"><h2>うちわの仕上がり</h2><p>表面は写真の位置や大きさを調整できます。裏面はスタンプを選ぶだけです。</p></div>
       <div class="tabs">
-        <button type="button" class="tab" id="tabFront" aria-selected="true">① 表 <em>記念写真</em></button>
-        <button type="button" class="tab" id="tabBack" aria-selected="false">② 裏 <em>スタンプ</em></button>
+        <button type="button" class="tab" id="tabFront" aria-selected="true">表 <em>記念写真</em></button>
+        <button type="button" class="tab" id="tabBack" aria-selected="false">裏 <em>スタンプ</em></button>
       </div>
       <div class="stage-wrap"><canvas id="stage" width="1024" height="725" aria-label="うちわ編集キャンバス"></canvas></div>
       <button type="button" class="back-select-again" id="backSelectAgain">＋ 別のスタンプも選ぶ</button>
@@ -166,25 +188,28 @@ body[data-side="back"] .stage-wrap canvas{cursor:default}
 
     <div>
       <section class="panel edit-panel" aria-label="デザイン編集">
-        <div class="section-head"><h2 id="editorTitle">① 記念写真を選ぶ</h2><p id="editorDesc">会場で撮った写真を選びましょう。</p></div>
+        <div class="section-head"><h2 id="editorTitle">写真の調整</h2><p id="editorDesc">会場で撮った写真を選びましょう。</p></div>
         <div class="edit-body">
           <div class="edit-block active" id="frontEditor">
-            <label class="upload-label" for="photoInput">📷 写真を選ぶ・撮る</label>
+            <div class="photo-actions photo-actions-editor" role="group" aria-label="写真の入れ方">
+              <button type="button" class="photo-action" id="cameraEditor"><span class="photo-action-icon" aria-hidden="true">📷</span>カメラを起動</button>
+              <button type="button" class="photo-action" id="libraryEditor"><span class="photo-action-icon" aria-hidden="true">▣</span>ライブラリの写真を選択</button>
+            </div>
             <div class="subhint">写真を選んだら、上のうちわで位置を調整できます。<br>指２本の操作が難しいときは「大きく」「小さく」「回す」を押してください。</div>
             <div class="ctrlbox">
               <div class="eyeline">写真をきれいにする（お好みで）</div>
               <div class="ctrlrow"><button type="button" class="btn primary" id="autoAdjust">✨ 写真をきれいに</button><button type="button" class="btn" id="adjustReset">補正を戻す</button></div>
             </div>
-            <button type="button" class="btn primary" id="nextBack" style="display:block;width:100%;margin-top:14px">次へ　② スタンプを選ぶ →</button>
+            <button type="button" class="btn primary" id="nextBack" style="display:block;width:100%;margin-top:14px">次へ　スタンプを選ぶ →</button>
           </div>
 
           <div class="edit-block" id="backEditor">
             <div class="eyeline">好きなスタンプを１つ選ぶ</div>
-            <div class="subhint">スタンプを押すと、裏面の中央に大きく入ります。<br>裏面は動かさず、スタンプの種類を選ぶイメージです。</div>
+            <div class="subhint">スタンプを押すと、裏面の中央より少し下に大きく入ります。<br>裏面は動かさず、スタンプの種類を選ぶイメージです。</div>
             <div class="stamp-grid" id="stampGrid"></div>
             <div id="stampControls" class="done-tip" role="status">スタンプを選びました。裏面に大きく入りました。</div>
             <div id="stampEmpty" class="empty-select">好きなスタンプを１つ押してみてください。</div>
-            <button type="button" class="btn primary" id="nextOrder" style="display:block;width:100%;margin-top:14px">次へ　③ 注文する →</button>
+            <button type="button" class="btn primary" id="nextOrder" style="display:block;width:100%;margin-top:14px">次へ　注文する →</button>
           </div>
         </div>
       </section>
@@ -215,6 +240,8 @@ body[data-side="back"] .stage-wrap canvas{cursor:default}
 (()=>{
 'use strict';
 const CW=1024, CH=725, PRINT_W=3508, PRINT_H=2480;
+// A4横297mmを1024pxで表す。旧y=292から下に10mm（約34.48px）。
+const STAMP_CENTER_Y = 292 + (CW / 297) * 10;
 const ASSET_PATHS = {
     headerLogo:'assets/akibashofilter.png',
     frontBase:'assets/fan1-highres.png',
@@ -271,7 +298,7 @@ function redo(){ const a=side==='front'?frontStack:backStack,b=side==='front'?fr
 function updateUndo(){ el('undoBtn').disabled=!(side==='front'?frontStack:backStack).length; el('redoBtn').disabled=!(side==='front'?frontRedo:backRedo).length; }
 
 function drawPhoto(ctx){
-  if(!photoImage){ ctx.fillStyle='#f1c343'; ctx.fillRect(0,0,CW,CH); return; }
+  if(!photoImage){ ctx.fillStyle='#f7f7f7'; ctx.fillRect(0,0,CW,CH); return; }
   ctx.save();
   ctx.translate(photo.x,photo.y); ctx.rotate(photo.angle*Math.PI/180);
   ctx.filter=`brightness(${photo.bright}) contrast(${photo.contrast}) saturate(${photo.sat})`;
@@ -315,7 +342,10 @@ function drawFrontComposition(ctx,outW,outH){
 
 function drawBackComposition(ctx,outW,outH){
   ctx.save(); ctx.fillStyle='#fff'; ctx.fillRect(0,0,outW,outH);
+  // 裏面の黄を元の70%の濃さに調整（白の上に重ねる）。
+  ctx.save(); ctx.globalAlpha=0.70;
   ctx.drawImage(pics[BACK_BASE_KEY],0,0,outW,outH);
+  ctx.restore();
   if(currentStamp()){
     const layer=getLayer(outW,outH), l=layer.getContext('2d');
     l.setTransform(1,0,0,1,0,0); l.clearRect(0,0,outW,outH); l.setTransform(outW/CW,0,0,outH/CH,0,0);
@@ -337,10 +367,10 @@ function switchSide(which){
   if(!['front','back'].includes(which))return;
   side=which; document.body.dataset.side=which;
   ['Front','Back'].forEach(v=>{ const x=v.toLowerCase(); el('tab'+v).setAttribute('aria-selected', String(which===x)); el('mini'+v).classList.toggle('active', which===x); el(x+'Editor').classList.toggle('active', which===x); });
-  el('editorTitle').textContent = which==='front' ? '① 記念写真を選ぶ' : '② スタンプを選ぶ';
+  el('editorTitle').textContent = which==='front' ? '写真の調整' : 'スタンプを選ぶ';
   el('editorDesc').textContent = which==='front' ? '会場で撮った写真を選びましょう。' : '好きなスタンプを1つ選ぶだけです。';
   el('stageSide').textContent = which==='front' ? '表面' : '裏面';
-  el('stageHelp').textContent = which==='front' ? (photoImage ? '写真を指で動かせます。' : 'まず写真を選んでください。') : (currentStamp() ? 'スタンプが中央に大きく入っています。' : '好きなスタンプを選んでください。');
+  el('stageHelp').textContent = which==='front' ? (photoImage ? '写真を指で動かせます。' : 'まず写真を選んでください。') : (currentStamp() ? 'スタンプが中央より少し下に入っています。' : '好きなスタンプを選んでください。');
   updateUndo(); updateTouchTools(); render();
 }
 function updateTouchTools(){
@@ -354,10 +384,10 @@ function updateStampControls(){ const has=!!currentStamp(); el('stampControls').
 function addStamp(key){
   if(!pics[key])return;
   saveUndo();
-  const s={id:stampId++, key, x:512, y:292};
+  const s={id:stampId++, key, x:512, y:STAMP_CENTER_Y};
   stamps=[s]; selected=s.id; updateStampControls();
   const label=stampsMeta[key]||'スタンプ';
-  el('stageHelp').textContent='「'+label+'」を選びました。裏面の中央に大きく入りました。';
+  el('stageHelp').textContent='「'+label+'」を選びました。裏面の中央より少し下に大きく入りました。';
   el('backPickStatus').textContent='✓ 「'+label+'」を選びました';
   switchSide('back'); render(); updateThumbs();
 }
@@ -400,7 +430,7 @@ async function onPhotoSelected(e){
     photo={x:512,y:330,scale:1,angle:0,bright:1,sat:1,contrast:1};
     frontStack=[]; frontRedo=[]; switchSide('front'); updateUndo(); updateTouchTools();
     el('stageHelp').textContent='写真が入りました。指で動かせます。';
-    el('photoStart').classList.add('is-ready'); el('photoStartAction').textContent='写真を選び直す';
+    el('photoStart').classList.add('is-ready');
     render(); updateThumbs(); scrollToStage();
   }catch{ alert('写真を開けませんでした。別の画像を選んでください。'); }
   finally{ URL.revokeObjectURL(objectURL); e.target.value=''; }
@@ -416,7 +446,7 @@ function timeout(p,ms,name){ return Promise.race([p,new Promise((_,reject)=>setT
 
 async function sendOrder(){
   if(!ready){ status('画像の準備が終わっていません。','error'); return; }
-  if(!photoImage){ switchSide('front'); status('① まず表面の記念写真を選んでください。','error'); el('photoInput').focus(); return; }
+  if(!photoImage){ switchSide('front'); status('① まず表面の記念写真を選んでください。','error'); el('libraryStart').focus(); return; }
   if(!currentStamp()){ switchSide('back'); status('② 裏面のスタンプを１つ選んでください。','error'); el('stageHelp').textContent='スタンプを１つ選んでください。'; return; }
   if(!el('consent').checked){ status('写真の利用について同意欄にチェックしてください。','error'); return; }
   const btn=el('orderBtn'); btn.disabled=true; btn.textContent='注文データを送信中…'; el('complete').style.display='none';
@@ -446,6 +476,11 @@ function wire(){
   el('toggleMoreStamps').onclick=()=>{ const grid=el('moreStampGrid'), expanded=!grid.classList.contains('is-open'); grid.classList.toggle('is-open',expanded); el('toggleMoreStamps').setAttribute('aria-expanded',String(expanded)); el('toggleMoreStamps').textContent=expanded?'－ ほかのスタンプを閉じる':'＋ ほかのスタンプを見る（６種類）'; };
   el('nextOrder').onclick=()=>el('orderPanel').scrollIntoView({behavior:'smooth',block:'start'});
   el('undoBtn').onclick=undo; el('redoBtn').onclick=redo;
+  // capture属性つきの入力だけがカメラを直接開く。ライブラリ用にはcaptureを付けない。
+  for(const [buttonId,inputId] of [['cameraStart','cameraInput'],['cameraEditor','cameraInput'],['libraryStart','photoInput'],['libraryEditor','photoInput']]){
+    el(buttonId).onclick=()=>el(inputId).click();
+  }
+  el('cameraInput').addEventListener('change', onPhotoSelected);
   el('photoInput').addEventListener('change', onPhotoSelected);
   el('smallerBtn').onclick=()=>changeSize(0.86); el('biggerBtn').onclick=()=>changeSize(1.16); el('rotateBtn').onclick=rotateTarget; el('resetThingBtn').onclick=resetTarget;
   el('autoAdjust').onclick=()=>{ if(!photoImage)return; saveUndo(); photo.bright=1.10; photo.sat=1.16; photo.contrast=1.08; render(); updateThumbs(); };
