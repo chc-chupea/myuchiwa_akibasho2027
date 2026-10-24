@@ -23,10 +23,6 @@ main{padding:14px 0 40px}
 .preview-panel{position:sticky;top:12px}
 .section-head{padding:16px 18px 12px;border-bottom:1px solid #efe4cf}
 .section-head h2{margin:0 0 4px;font-size:22px} .section-head p{margin:0;font-size:16px;color:var(--muted)}
-.tabs{display:flex;gap:8px;padding:12px 14px 5px}
-.tab{flex:1;min-height:62px;border-radius:13px;padding:8px 8px;border:2px solid #d6c4aa;background:#f8f0df;color:#523c2a;font-size:18px;font-weight:800}
-.tab[aria-selected="true"]{background:var(--brown2);color:#fff;border-color:var(--brown2);box-shadow:0 3px 10px rgba(54,32,20,.18)}
-.tab em{display:block;margin-top:2px;font-style:normal;font-size:12px;font-weight:600}
 .stage-wrap{margin:10px 12px 8px;border:2px solid #baa788;border-radius:16px;overflow:hidden;background:#fff;position:relative}
 .stage-wrap canvas{width:100%;height:auto;display:block;touch-action:none;cursor:grab;background:#fff}
 .stage-wrap canvas:active{cursor:grabbing}
@@ -81,7 +77,6 @@ main{padding:14px 0 40px}
 .back-start-heading{display:flex;align-items:center;gap:8px;justify-content:center;font-size:22px;font-weight:900;line-height:1.4;color:#492d1a;margin:0 0 5px}
 .back-start-lead{font-size:15px;line-height:1.5;color:#5b4d42;margin:0 0 10px;text-align:center}
 .back-more-grid{display:none} .back-more-grid.is-open{display:grid}
-.back-select-again{display:none}
 body[data-side="back"] .gesture-note, body[data-side="back"] .touch-tools{display:none}
 body[data-side="back"] .stage-wrap canvas{cursor:default}
 @media(max-width:900px){.layout{grid-template-columns:1fr} .preview-panel{position:static} .order-grid{grid-template-columns:1fr} }
@@ -99,9 +94,8 @@ body[data-side="back"] .stage-wrap canvas{cursor:default}
  body[data-side="back"] .photo-start{display:none}
  body[data-side="back"] .back-start{display:block;border:2px solid #d2b78e;border-radius:18px;background:#fff;box-shadow:0 6px 20px rgba(80,31,60,.08);padding:12px 12px 14px;margin:0 0 9px}
  .back-start .stamp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0} .back-start .stamp-btn{height:98px;padding:5px 4px 30px} .back-start .stamp-btn span{font-size:12px;line-height:1.12;white-space:normal;max-height:32px;overflow:hidden}
- body[data-side="back"] .back-select-again{display:block;margin:4px 10px 10px;width:calc(100% - 20px);min-height:50px;border:2px solid #be9dae;border-radius:12px;background:#fff8fc;font-size:17px;font-weight:800;color:#693452}
  body[data-side="back"] .edit-panel .section-head, body[data-side="back"] #backEditor .eyeline, body[data-side="back"] #backEditor .subhint, body[data-side="back"] #backEditor #stampGrid, body[data-side="back"] #backEditor #stampControls, body[data-side="back"] #backEditor #stampEmpty{display:none!important}
- .preview-panel .section-head{padding:11px 12px 7px;border-bottom:none} .preview-panel .section-head h2{font-size:17px;margin:0} .preview-panel .section-head p{display:none} .preview-panel .tabs{padding:5px 10px 0;gap:7px} .preview-panel .tab{min-height:52px;font-size:16px;padding:6px 6px;border-radius:10px} .preview-panel .tab em{font-size:11px;margin-top:0} .stage-wrap{margin:7px 10px 6px} .stage-caption{padding:0 12px 7px;font-size:14px}
+ .preview-panel .section-head{padding:11px 12px 7px;border-bottom:none} .preview-panel .section-head h2{font-size:17px;margin:0} .preview-panel .section-head p{display:none} .stage-wrap{margin:7px 10px 6px} .stage-caption{padding:0 12px 7px;font-size:14px}
  .edit-panel .section-head{padding:12px 14px} .edit-body{padding:14px}
  }
 @media(max-width:440px){ .wrap{width:calc(100% - 18px)} .stamp-btn{height:94px} .touch-tools{gap:6px} .touch-btn{min-height:60px;font-size:22px} .touch-btn span{font-size:13px} .section-head h2{font-size:20px} .field label{font-size:16px} }
@@ -127,6 +121,11 @@ body[data-side="back"] .stage-wrap canvas{cursor:default}
 @media(max-width:360px){.photo-action{font-size:15px}.photo-action-icon{font-size:19px}}
 /* スマホではおすすめ6つだけを表示。残り6つは展開後に表示する */
 @media(max-width:870px){.back-start .back-more-grid:not(.is-open){display:none}}
+
+/* スマホの写真操作は指だけ。補助ボタンを表示しない */
+@media (max-width:870px){
+  #touchTools{display:none!important}
+}
 </style>
 </head>
 <body>
@@ -165,12 +164,7 @@ body[data-side="back"] .stage-wrap canvas{cursor:default}
   <div class="layout">
     <section class="panel preview-panel" aria-label="うちわのプレビュー">
       <div class="section-head"><h2>うちわの仕上がり</h2><p>表面は写真の位置や大きさを調整できます。裏面はスタンプを選ぶだけです。</p></div>
-      <div class="tabs">
-        <button type="button" class="tab" id="tabFront" aria-selected="true">表 <em>記念写真</em></button>
-        <button type="button" class="tab" id="tabBack" aria-selected="false">裏 <em>スタンプ</em></button>
-      </div>
       <div class="stage-wrap"><canvas id="stage" width="1024" height="725" aria-label="うちわ編集キャンバス"></canvas></div>
-      <button type="button" class="back-select-again" id="backSelectAgain">＋ 別のスタンプも選ぶ</button>
       <div class="stage-caption"><span id="stageHelp" role="status">写真を選ぶと、ここに表示されます。</span><b id="stageSide">表面</b></div>
       <div class="gesture-note" id="gestureNote">☝️ １本指で動かす　✌️ ２本指で大きさ・回転</div>
       <div class="touch-tools" id="touchTools" aria-label="指の操作が難しいときのボタン">
@@ -195,7 +189,7 @@ body[data-side="back"] .stage-wrap canvas{cursor:default}
               <button type="button" class="photo-action" id="cameraEditor"><span class="photo-action-icon" aria-hidden="true">📷</span>カメラを起動</button>
               <button type="button" class="photo-action" id="libraryEditor"><span class="photo-action-icon" aria-hidden="true">▣</span>ライブラリの写真を選択</button>
             </div>
-            <div class="subhint">写真を選んだら、上のうちわで位置を調整できます。<br>指２本の操作が難しいときは「大きく」「小さく」「回す」を押してください。</div>
+            <div class="subhint">写真はうちわの上で指を動かして位置を調整できます。<br>２本指で大きさや角度も変えられます。</div>
             <div class="ctrlbox">
               <div class="eyeline">写真をきれいにする（お好みで）</div>
               <div class="ctrlrow"><button type="button" class="btn primary" id="autoAdjust">✨ 写真をきれいに</button><button type="button" class="btn" id="adjustReset">補正を戻す</button></div>
@@ -366,7 +360,7 @@ function updateThumbs(){ if(!ready)return; for(const which of ['front','back']){
 function switchSide(which){
   if(!['front','back'].includes(which))return;
   side=which; document.body.dataset.side=which;
-  ['Front','Back'].forEach(v=>{ const x=v.toLowerCase(); el('tab'+v).setAttribute('aria-selected', String(which===x)); el('mini'+v).classList.toggle('active', which===x); el(x+'Editor').classList.toggle('active', which===x); });
+  ['Front','Back'].forEach(v=>{ const x=v.toLowerCase(); el('mini'+v).classList.toggle('active', which===x); el(x+'Editor').classList.toggle('active', which===x); });
   el('editorTitle').textContent = which==='front' ? '写真の調整' : 'スタンプを選ぶ';
   el('editorDesc').textContent = which==='front' ? '会場で撮った写真を選びましょう。' : '好きなスタンプを1つ選ぶだけです。';
   el('stageSide').textContent = which==='front' ? '表面' : '裏面';
@@ -470,9 +464,8 @@ function rotateTarget(){ if(side!=='front' || !photoImage)return; saveUndo(); ph
 function resetTarget(){ if(side!=='front' || !photoImage)return; saveUndo(); Object.assign(photo,{x:512,y:330,scale:1,angle:0}); render(); updateThumbs(); }
 
 function wire(){
-  el('tabFront').onclick=()=>switchSide('front'); el('tabBack').onclick=()=>{ switchSide('back'); showBackPicker(); };
   el('miniFront').onclick=()=>{ switchSide('front'); scrollToStage(); }; el('miniBack').onclick=()=>{ switchSide('back'); showBackPicker(); };
-  el('nextBack').onclick=()=>{ switchSide('back'); showBackPicker(); }; el('backSelectAgain').onclick=showBackPicker;
+  el('nextBack').onclick=()=>{ switchSide('back'); showBackPicker(); };
   el('toggleMoreStamps').onclick=()=>{ const grid=el('moreStampGrid'), expanded=!grid.classList.contains('is-open'); grid.classList.toggle('is-open',expanded); el('toggleMoreStamps').setAttribute('aria-expanded',String(expanded)); el('toggleMoreStamps').textContent=expanded?'－ ほかのスタンプを閉じる':'＋ ほかのスタンプを見る（６種類）'; };
   el('nextOrder').onclick=()=>el('orderPanel').scrollIntoView({behavior:'smooth',block:'start'});
   el('undoBtn').onclick=undo; el('redoBtn').onclick=redo;
