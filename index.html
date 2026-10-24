@@ -239,7 +239,7 @@ const STAMP_CENTER_Y = 292 + (CW / 297) * 10;
 const ASSET_PATHS = {
     headerLogo:'assets/akibashofilter.png',
     frontBase:'assets/fan1-highres.png',
-    backBase:'assets/fan-stamp.png',
+    backBase:'assets/fan-stamp.png?v=pink20261024',
     frontMask:'assets/fan-mask.png',
     fanOutline:'assets/fan-outline.png',
     stamp01:'assets/01loveu.png',
@@ -336,10 +336,8 @@ function drawFrontComposition(ctx,outW,outH){
 
 function drawBackComposition(ctx,outW,outH){
   ctx.save(); ctx.fillStyle='#fff'; ctx.fillRect(0,0,outW,outH);
-  // 裏面の黄を元の70%の濃さに調整（白の上に重ねる）。
-  ctx.save(); ctx.globalAlpha=0.70;
+  // 添付のピンク版 fan-stamp.png を加工せずにそのまま使用する。
   ctx.drawImage(pics[BACK_BASE_KEY],0,0,outW,outH);
-  ctx.restore();
   if(currentStamp()){
     const layer=getLayer(outW,outH), l=layer.getContext('2d');
     l.setTransform(1,0,0,1,0,0); l.clearRect(0,0,outW,outH); l.setTransform(outW/CW,0,0,outH/CH,0,0);
