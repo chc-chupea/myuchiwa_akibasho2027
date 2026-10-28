@@ -68,6 +68,7 @@ main{padding:14px 0 40px}
 .agree{display:flex;gap:8px;align-items:flex-start;font-size:17px;line-height:1.7;margin:15px 0} .agree input{margin-top:4px;accent-color:var(--brown);height:24px;width:24px;min-width:24px}
 .submit{display:block;width:100%;background:var(--brown2);border:0;border-radius:13px;color:white;font-weight:900;padding:17px 12px;font-size:21px;min-height:72px;box-shadow:0 3px 10px rgba(47,30,20,.23)}
 .status{font-size:17px;line-height:1.65;margin:12px 0 0;white-space:pre-wrap} .status.error{color:#b5293e} .status.success{color:var(--ok)}
+.pending-recovery{display:none;margin:12px 0;padding:12px 14px;border:2px solid #d7b578;border-radius:12px;background:#fff8e8;font-size:15px;line-height:1.6} .pending-recovery p{margin:0 0 9px} .pending-recovery button{margin:4px 5px 4px 0;font-size:14px;padding:8px 10px;min-height:42px}
 .complete{display:none;margin-top:15px;border-radius:14px;padding:18px;background:#ecf8f1;border:1px solid #c8ead6} .complete strong{display:block;font-size:24px;letter-spacing:.05em} .complete p{margin:7px 0;color:#2d694a;line-height:1.6}
 .footer{margin-top:24px;font-size:12px;color:#867c71;line-height:1.8;text-align:center}
 .visually-hidden-file{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;opacity:0!important;pointer-events:none!important}
@@ -219,7 +220,12 @@ body[data-side="back"] .stage-wrap canvas{cursor:default}
           <div class="note">注文すると、写真とスタンプの印刷データがお店に送られます。お客様のスマホへの画像保存は不要です。<br><b>お渡し後の安心：</b>店舗が受け渡しを登録した24時間後を目安に、写真と注文情報を自動削除する仕組みです。※実際の自動削除には店舗側のFirebase設定が必要です。</div>
           <label class="agree"><input type="checkbox" id="consent"> <span>写真をうちわの制作・注文受付に使うことに同意します。</span></label>
           <button type="button" class="submit" id="orderBtn">注文を確定する</button>
-          <p id="orderStatus" class="status" role="status"></p>
+          <p id="orderStatus" class="status" role="status" aria-live="polite"></p>
+          <div id="pendingRecovery" class="pending-recovery" role="group" aria-label="未確定の注文を確認">
+            <p id="pendingRecoveryText"></p>
+            <button type="button" class="btn" id="checkPendingBtn">受付状況を確認する</button>
+            <button type="button" class="btn" id="clearPendingBtn">スタッフ確認後に未完了記録を解除</button>
+          </div>
           <div class="complete" id="complete"><strong id="orderCode">受付番号</strong><p>注文データを送信しました。この番号を控えて、会場でお伝えください。</p><button type="button" class="btn" id="copyCode">受付番号をコピー</button></div>
           <div class="tiny" style="margin-top:12px">お店では表面と裏面の２枚を印刷します。お客様が画像を保存する必要はありません。</div>
         </div>
@@ -266,6 +272,7 @@ const el=id=>document.getElementById(id), stage=el('stage'), sc=stage.getContext
 const pics={}; let photoImage=null, side='front', stampId=1, selected=null, stamps=[];
 let photo={x:512,y:330,scale:1,angle:0,bright:1,sat:1,contrast:1};
 let backStack=[], frontStack=[], backRedo=[], frontRedo=[], pinches=new Map(), gesture=null, ready=false, lastOrderCode='';
+ let sending=false, photoLoading=false, orderFinalized=false, lockedControls=[];
 const stampsMeta={}; STAMPS.forEach(([key,label])=>stampsMeta[key]=label);
 const featured=['stamp01','stamp03','stamp07','stamp08','stamp12','stamp05'];
 
@@ -274,14 +281,21 @@ function loadImage(src){
 }
 
 async function boot(){
-  try{
-    el('headerLogo').src = resolveAsset(HEADER_LOGO_KEY);
-    const entries = await Promise.all([HEADER_LOGO_KEY, FRONT_MASK_KEY, FRONT_BASE_KEY, FAN_OUTLINE_KEY, BACK_BASE_KEY, ...STAMPS.map(([k])=>k)].map(async key=>[key, await loadImage(key)]));
-    entries.forEach(([k,img])=>pics[k]=img);
-    ready=true; render(); updateThumbs();
-  }catch(e){
-    console.error(e); el('stageHelp').textContent='画像の準備に失敗しました。';
+  el('headerLogo').src = resolveAsset(HEADER_LOGO_KEY);
+  const keys=[FRONT_MASK_KEY,FRONT_BASE_KEY,FAN_OUTLINE_KEY,BACK_BASE_KEY,...STAMPS.map(([k])=>k)];
+  const settled=await Promise.allSettled(keys.map(key=>loadImage(key)));
+  settled.forEach((result,i)=>{if(result.status==='fulfilled')pics[keys[i]]=result.value;});
+  const required=[FRONT_MASK_KEY,FRONT_BASE_KEY,FAN_OUTLINE_KEY,BACK_BASE_KEY];
+  const missingRequired=required.filter(k=>!pics[k]);
+  for(const [key] of STAMPS){if(!pics[key]){
+    document.querySelectorAll('[data-stamp-key="'+key+'"]').forEach(b=>{b.disabled=true;b.title='画像が見つからないため選択できません';});
+  }}
+  if(missingRequired.length){
+    el('stageHelp').textContent='画像の準備に失敗しました。管理者に連絡してください。';
+    status('必要な画像がありません：'+missingRequired.map(resolveAsset).join('、'),'error');
+    return;
   }
+  ready=true; render(); updateThumbs();
 }
 
 function snapshot(){ return side==='front' ? {...photo} : {stamps:stamps.map(s=>({...s})), selected}; }
@@ -374,7 +388,7 @@ function updateTouchTools(){
 function updateStampControls(){ const has=!!currentStamp(); el('stampControls').style.display=has?'block':'none'; el('stampEmpty').style.display=has?'none':'block'; }
 
 function addStamp(key){
-  if(!pics[key])return;
+  if(sending || !pics[key])return;
   saveUndo();
   const s={id:stampId++, key, x:512, y:STAMP_CENTER_Y};
   stamps=[s]; selected=s.id; updateStampControls();
@@ -390,13 +404,13 @@ function angle(a,b){ return Math.atan2(b.y-a.y,b.x-a.x); }
 function clamp(v,min,max){ return Math.max(min, Math.min(max,v)); }
 
 function onPointerDown(e){
-  if(!ready || side!=='front' || !photoImage || (e.pointerType==='mouse' && e.button!==0))return;
+  if(!ready || sending || side!=='front' || !photoImage || (e.pointerType==='mouse' && e.button!==0))return;
   const p=posFromEvent(e); stage.setPointerCapture(e.pointerId); pinches.set(e.pointerId,p);
   if(pinches.size===1){ saveUndo(); gesture={kind:'drag', pointerId:e.pointerId, last:p}; }
   else if(pinches.size===2){ const pts=[...pinches.values()]; gesture={kind:'pinch', scale:photo.scale, angle:photo.angle, x:photo.x, y:photo.y, midpoint:{x:(pts[0].x+pts[1].x)/2, y:(pts[0].y+pts[1].y)/2}, distance:Math.max(1,dist(pts[0],pts[1])), radians:angle(pts[0],pts[1])}; }
 }
 function onPointerMove(e){
-  if(side!=='front' || !pinches.has(e.pointerId) || !gesture)return;
+  if(sending || side!=='front' || !pinches.has(e.pointerId) || !gesture)return;
   const p=posFromEvent(e); pinches.set(e.pointerId,p);
   if(gesture.kind==='pinch'){
     if(pinches.size!==2)return; const ps=[...pinches.values()]; const midpoint={x:(ps[0].x+ps[1].x)/2, y:(ps[0].y+ps[1].y)/2};
@@ -413,9 +427,10 @@ function scrollToStage(){ easyScrollTo('stage','center'); }
 function showBackPicker(){ if(window.matchMedia('(max-width:870px)').matches) easyScrollTo('backStart','start'); else scrollToStage(); }
 
 async function onPhotoSelected(e){
-  const file=e.target.files?.[0]; if(!file)return;
+  const file=e.target.files?.[0]; if(!file || sending || photoLoading){e.target.value='';return;}
   if(!file.type.startsWith('image/')){ alert('画像ファイルを選択してください。'); e.target.value=''; return; }
   if(file.size>30*1024*1024){ alert('画像は30MB以下を選択してください。'); e.target.value=''; return; }
+  photoLoading=true;
   const objectURL=URL.createObjectURL(file);
   try{
     const img=await loadImage(objectURL); photoImage=img;
@@ -425,7 +440,7 @@ async function onPhotoSelected(e){
     el('photoStart').classList.add('is-ready');
     render(); updateThumbs(); scrollToStage();
   }catch{ alert('写真を開けませんでした。別の画像を選んでください。'); }
-  finally{ URL.revokeObjectURL(objectURL); e.target.value=''; }
+  finally{ photoLoading=false; URL.revokeObjectURL(objectURL); e.target.value=''; }
 }
 async function toPngBlob(c){ return await new Promise((resolve,reject)=>c.toBlob(blob=>blob?resolve(blob):reject(new Error('画像を書き出せませんでした')),'image/png')); }
 function status(s,kind=''){ const x=el('orderStatus'); x.textContent=s; x.className='status '+kind; }
@@ -436,25 +451,108 @@ async function getFirebase(){ if(firebase)return firebase; const [appmod,fs,st]=
 function dayKey(){ const d=new Date(); return [String(d.getFullYear()).slice(-2), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join(''); }
 function timeout(p,ms,name){ return Promise.race([p,new Promise((_,reject)=>setTimeout(()=>reject(new Error(name+'が時間切れです。通信状況を確認してください。')),ms))]); }
 
+const PENDING_STORAGE_KEY='aki-basho-pending-'+shopId;
+let pendingOrder=null;
+function readPending(){
+  try{const raw=localStorage.getItem(PENDING_STORAGE_KEY);if(!raw)return null;const p=JSON.parse(raw);
+    if(p && p.shopId===shopId && typeof p.queueId==='string' && typeof p.displayCode==='string' && typeof p.signature==='string')return p;
+  }catch(e){console.warn('受付情報の復元不可',e);}return null;
+}
+function storePending(p){pendingOrder=p;try{localStorage.setItem(PENDING_STORAGE_KEY,JSON.stringify(p));}catch(e){console.warn('受付情報を端末に保存できません',e);}}
+function clearPending(){pendingOrder=null;try{localStorage.removeItem(PENDING_STORAGE_KEY);}catch(e){console.warn(e);}showRecovery();}
+function showRecovery(){
+  el('pendingRecovery').style.display=pendingOrder?'block':'none';
+  if(pendingOrder)el('pendingRecoveryText').textContent=sending?'受付番号 '+pendingOrder.displayCode+' で送信処理中です。送信が中断した場合も、この番号を使って確認します。':'前回の受付 '+pendingOrder.displayCode+' が完了したか確認できません。新しい受付番号を発行する前に、受付管理画面を確認してください。';
+}
+function setSending(value){
+  sending=value;
+  if(value){
+    lockedControls=[...document.querySelectorAll('#photoStart button,#backStart button,#frontEditor button,#backEditor button,.mini,#action-footer button,.action-footer button,#copies,#customerName,#consent')].map(e=>[e,e.disabled]);
+    lockedControls.forEach(([e])=>{e.disabled=true;});
+  }else{
+    lockedControls.forEach(([e,wasDisabled])=>{e.disabled=wasDisabled;});lockedControls=[];
+    updateUndo();updateTouchTools();
+  }
+  el('orderBtn').disabled=value||orderFinalized;
+  showRecovery();
+  el('checkPendingBtn').disabled=value;
+  el('clearPendingBtn').disabled=value;
+}
+async function fingerprint(){
+  const tiny=(which)=>{const c=document.createElement('canvas');c.width=320;c.height=227;drawComposition(c.getContext('2d'),which,c.width,c.height);return c.toDataURL('image/png');};
+  const data=JSON.stringify([tiny('front'),tiny('back'),el('customerName').value.trim(),Number(el('copies').value)]);
+  if(crypto?.subtle){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(data));return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');}
+  // 安全なコンテキスト以外では再送の同一性判定を行わず、受付側での確認を要求する。
+  throw new Error('このページでは送信内容の照合ができません。HTTPSで開いてください。');
+}
+async function readExistingOrder(db,fs,p){
+  // 顧客用Firebaseルールで注文の読み取りが禁じられている場合は、受付管理画面での確認に切り替える。
+  let snap;
+  try{snap=await timeout(fs.getDocFromServer(fs.doc(db,'orders',p.queueId)),15000,'注文状態の確認');}
+  catch(e){throw new Error('受付状況を自動確認できません。スタッフが受付管理画面で '+p.displayCode+' を確認してください。'+(e.code==='permission-denied'?'（お客様側の閲覧権限は不要です）':''));}
+  if(!snap.exists())return 'missing';
+  const o=snap.data();
+  if(o.shopId!==shopId||o.source!=='aki-basho-double-fan'||o.displayCode!==p.displayCode)throw new Error('受付番号の照合が一致しません。スタッフにご連絡ください。');
+  if(!o.frontImageUrl||!o.backImageUrl)throw new Error('注文情報はありますが印刷データが揃っていません。スタッフに確認してください。');
+  return 'complete';
+}
+function finishOrder(p){
+  lastOrderCode=p.displayCode;orderFinalized=true;clearPending();
+  el('orderCode').textContent='受付番号 '+p.displayCode;
+  el('complete').style.display='block';
+  status('注文が完了しました。表面・裏面の右下に同じ受付番号を入れました。','success');
+  el('complete').scrollIntoView({behavior:'smooth',block:'center'});
+}
+async function checkPending(){
+  if(sending||!pendingOrder)return;
+  const b=el('checkPendingBtn');b.disabled=true;status('受付状況を確認しています…');
+  try{const {db,fs}=await getFirebase();const result=await readExistingOrder(db,fs,pendingOrder);
+    if(result==='complete')finishOrder(pendingOrder);
+    else status('この受付番号の注文登録は見つかりません。同じ写真・スタンプ・本数なら「注文を確定する」で再試行できます。別の内容で注文する場合は、スタッフに確認してください。','error');
+  }catch(e){status(e.message||'受付状況を確認できませんでした。','error');}
+  finally{b.disabled=false;}
+}
 async function sendOrder(){
+  if(sending||orderFinalized)return;
   if(!ready){ status('画像の準備が終わっていません。','error'); return; }
+  if(photoLoading){status('写真の読み込みが終わってから注文してください。','error');return;}
   if(!photoImage){ switchSide('front'); status('① まず表面の記念写真を選んでください。','error'); el('libraryStart').focus(); return; }
   if(!currentStamp()){ switchSide('back'); status('② 裏面のスタンプを１つ選んでください。','error'); el('stageHelp').textContent='スタンプを１つ選んでください。'; return; }
   if(!el('consent').checked){ status('写真の利用について同意欄にチェックしてください。','error'); return; }
-  const btn=el('orderBtn'); btn.disabled=true; btn.textContent='注文データを送信中…'; el('complete').style.display='none';
+  setSending(true);const btn=el('orderBtn');btn.textContent='注文データを送信中…';el('complete').style.display='none';
   try{
-    status('受付番号を発行しています…');
-    const {db,storage,fs,st}=await getFirebase(); const date=dayKey(), counterRef=fs.doc(db,'counters',shopId+'_'+date);
-    const serial=await timeout(fs.runTransaction(db,async tx=>{ const snap=await tx.get(counterRef), n=(snap.exists()?Number(snap.data().lastNumber)||0:0)+1; tx.set(counterRef,{shopId,dayKey:date,lastNumber:n,updatedAt:fs.serverTimestamp()},{merge:true}); return n; }),30000,'受付番号発行');
-    const shortId=String(serial).padStart(4,'0'), queueId=shopId+'-'+date+'-'+shortId, displayCode='AK'+date.slice(2)+'-'+shortId;
-    status('両面の印刷データを作成しています…'); const fcan=makePrintCanvas('front',displayCode), fblob=await toPngBlob(fcan); const bcan=makePrintCanvas('back',displayCode), bblob=await toPngBlob(bcan);
-    const folder=`orders/${shopId}/${date}`, frontPath=`${folder}/${queueId}.png`, backPath=`${folder}/${queueId}_back.png`;
-    status('表面の写真を送信しています…'); const fr=st.ref(storage,frontPath); await timeout(st.uploadBytes(fr,fblob,{contentType:'image/png'}),90000,'表面の送信'); const imageUrl=await st.getDownloadURL(fr);
-    status('裏面のスタンプを送信しています…'); const br=st.ref(storage,backPath); await timeout(st.uploadBytes(br,bblob,{contentType:'image/png'}),90000,'裏面の送信'); const backImageUrl=await st.getDownloadURL(br);
-    status('注文を確定しています…'); const orderRef=fs.doc(db,'orders',queueId); await timeout(fs.setDoc(orderRef,{source:'aki-basho-double-fan',productType:'double-sided-fan',doubleSided:true,queueId,shortId,displayNo:serial,displayCode,shopId,shopName:'大相撲安芸場所巡業',shopCode:'AK',dayKey:date,customerName:el('customerName').value.trim(),copies:Number(el('copies').value),imageUrl,frontImageUrl:imageUrl,backImageUrl,storagePath:frontPath,backStoragePath:backPath,template:'aki-front',backTemplate:'aki-back',stampCount:currentStamp()?1:0,priceType:'event',unitPrice:null,totalPrice:null,status:'WAIT',retentionPolicy:'pickup-plus-24h',createdAt:fs.serverTimestamp(),updatedAt:fs.serverTimestamp()}),30000,'注文確定');
-    lastOrderCode=displayCode; el('orderCode').textContent='受付番号 '+displayCode; el('complete').style.display='block'; status('注文が完了しました。表面・裏面の右下に同じ受付番号を入れました。','success'); el('complete').scrollIntoView({behavior:'smooth',block:'center'});
-  }catch(e){ console.error(e); status('注文はまだ確定していません。\n'+(e.code==='permission-denied'?'Firebaseの権限設定により送信できません。管理者にご連絡ください。':e.message||'通信エラーが発生しました。')+'\n再送信の前に、受付側で注文の有無を確認してください。','error'); }
-  finally{ btn.disabled=false; btn.textContent='注文を確定する'; }
+    const signature=await fingerprint();
+    const {db,storage,fs,st}=await getFirebase();
+    let p=pendingOrder;
+    if(p){
+      const existing=await readExistingOrder(db,fs,p);
+      if(existing==='complete'){finishOrder(p);return;}
+      if(p.signature!==signature)throw new Error('以前の未確定注文と写真・スタンプ・本数・お名前が異なります。再送せず、スタッフに受付番号 '+p.displayCode+' を確認してください。');
+      status('前回の受付番号 '+p.displayCode+' で送信を再開します…');
+    }else{
+      status('受付番号を発行しています…');
+      const date=dayKey(),counterRef=fs.doc(db,'counters',shopId+'_'+date);
+      const serial=await timeout(fs.runTransaction(db,async tx=>{const snap=await tx.get(counterRef),n=(snap.exists()?Number(snap.data().lastNumber)||0:0)+1;tx.set(counterRef,{shopId,dayKey:date,lastNumber:n,updatedAt:fs.serverTimestamp()},{merge:true});return n;}),30000,'受付番号発行');
+      const shortId=String(serial).padStart(4,'0'),queueId=shopId+'-'+date+'-'+shortId,displayCode='AK'+date.slice(2)+'-'+shortId;
+      p={shopId,date,queueId,displayCode,shortId,serial,signature,createdAt:Date.now()};
+      storePending(p);showRecovery();
+    }
+    status('両面の印刷データを作成しています…');
+    const fcan=makePrintCanvas('front',p.displayCode),fblob=await toPngBlob(fcan);fcan.width=0;fcan.height=0;
+    const bcan=makePrintCanvas('back',p.displayCode),bblob=await toPngBlob(bcan);bcan.width=0;bcan.height=0;
+    const folder=`orders/${shopId}/${p.date}`,frontPath=`${folder}/${p.queueId}.png`,backPath=`${folder}/${p.queueId}_back.png`;
+    status('表面の写真を送信しています…');const fr=st.ref(storage,frontPath);await timeout(st.uploadBytes(fr,fblob,{contentType:'image/png'}),90000,'表面の送信');const imageUrl=await timeout(st.getDownloadURL(fr),15000,'表面URL取得');
+    status('裏面のスタンプを送信しています…');const br=st.ref(storage,backPath);await timeout(st.uploadBytes(br,bblob,{contentType:'image/png'}),90000,'裏面の送信');const backImageUrl=await timeout(st.getDownloadURL(br),15000,'裏面URL取得');
+    status('注文を確定しています…');const orderRef=fs.doc(db,'orders',p.queueId);
+    const orderData={source:'aki-basho-double-fan',productType:'double-sided-fan',doubleSided:true,queueId:p.queueId,shortId:p.shortId,displayNo:p.serial,displayCode:p.displayCode,shopId,shopName:'大相撲安芸場所巡業',shopCode:'AK',dayKey:p.date,customerName:el('customerName').value.trim(),copies:Number(el('copies').value),imageUrl,frontImageUrl:imageUrl,backImageUrl,storagePath:frontPath,backStoragePath:backPath,template:'aki-front',backTemplate:'aki-back',stampCount:1,priceType:'event',unitPrice:null,totalPrice:null,status:'WAIT',retentionPolicy:'pickup-plus-24h',createdAt:fs.serverTimestamp(),updatedAt:fs.serverTimestamp()};
+    await timeout(fs.setDoc(orderRef,orderData),30000,'注文確定');
+    finishOrder(p);
+  }catch(e){
+    console.error(e);const explanation=e.code==='permission-denied'?'Firebaseの権限設定により送信できません。管理者にご連絡ください。':e.message||'通信エラーが発生しました。';
+    status('注文の完了を確認できませんでした。\n'+explanation+'\n'+(pendingOrder?'受付番号 '+pendingOrder.displayCode+' を管理画面で確認してください。確認せずに新規注文を作らないでください。':'再試行してください。'),'error');
+  }finally{
+    setSending(false);btn.textContent=orderFinalized?'注文確定済み':pendingOrder?'注文を再確認・送信する':'注文を確定する';
+  }
 }
 
 function changeSize(factor){ if(side!=='front' || !photoImage)return; saveUndo(); photo.scale=clamp(photo.scale*factor,.6,3.5); render(); updateThumbs(); }
@@ -475,11 +573,18 @@ function wire(){
   el('smallerBtn').onclick=()=>changeSize(0.86); el('biggerBtn').onclick=()=>changeSize(1.16); el('rotateBtn').onclick=rotateTarget; el('resetThingBtn').onclick=resetTarget;
   el('autoAdjust').onclick=()=>{ if(!photoImage)return; saveUndo(); photo.bright=1.10; photo.sat=1.16; photo.contrast=1.08; render(); updateThumbs(); };
   el('adjustReset').onclick=()=>{ if(!photoImage)return; saveUndo(); photo.bright=photo.sat=photo.contrast=1; render(); updateThumbs(); };
-  const makeStampButton=(key,label)=>{ const b=document.createElement('button'); b.className='stamp-btn'; b.type='button'; b.title=label; b.setAttribute('aria-label', label+'を選ぶ'); const im=document.createElement('img'); im.src=resolveAsset(key); im.alt=''; const tag=document.createElement('span'); tag.textContent=label; b.append(im,tag); b.onclick=()=>addStamp(key); return b; };
+  const makeStampButton=(key,label)=>{ const b=document.createElement('button'); b.className='stamp-btn'; b.type='button'; b.dataset.stampKey=key; b.title=label; b.setAttribute('aria-label', label+'を選ぶ'); const im=document.createElement('img'); im.src=resolveAsset(key); im.alt=''; const tag=document.createElement('span'); tag.textContent=label; b.append(im,tag); b.onclick=()=>addStamp(key); return b; };
   for(const [key,label] of STAMPS){ el('stampGrid').append(makeStampButton(key,label)); el(featured.includes(key)?'quickStampGrid':'moreStampGrid').append(makeStampButton(key,label)); }
   stage.addEventListener('pointerdown',onPointerDown); stage.addEventListener('pointermove',onPointerMove); stage.addEventListener('pointerup',onPointerUp); stage.addEventListener('pointercancel',onPointerUp); stage.addEventListener('lostpointercapture',onPointerUp);
   el('copies').onchange=()=>el('quantityText').textContent=el('copies').value+'本';
   el('orderBtn').onclick=sendOrder;
+  el('checkPendingBtn').onclick=checkPending;
+  el('clearPendingBtn').onclick=()=>{
+    if(!pendingOrder)return;
+    if(!confirm('受付管理画面で '+pendingOrder.displayCode+' の注文が存在しないことをスタッフと確認しましたか？\n不明なまま解除すると二重注文になるおそれがあります。'))return;
+    clearPending();status('未完了記録を解除しました。新しい注文を始められます。');
+  };
+  pendingOrder=readPending();showRecovery();
   el('copyCode').onclick=async()=>{ try{ await navigator.clipboard.writeText(lastOrderCode); el('copyCode').textContent='コピーしました'; }catch{ el('copyCode').textContent='受付番号: '+lastOrderCode; } };
   updateUndo(); updateStampControls(); updateTouchTools();
 }
