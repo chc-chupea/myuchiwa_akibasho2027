@@ -127,6 +127,18 @@ body[data-side="back"] .stage-wrap canvas{cursor:default}
 @media (max-width:870px){
   #touchTools{display:none!important}
 }
+
+/* 表面の編集プレビューだけ、元画像の半透明の外側を見えるようにする。 */
+#stage {
+  background-color:#b5c0ca;
+  background-image:
+    linear-gradient(45deg,#d7dfe6 25%,transparent 25%,transparent 75%,#d7dfe6 75%),
+    linear-gradient(45deg,#d7dfe6 25%,transparent 25%,transparent 75%,#d7dfe6 75%);
+  background-size:26px 26px;
+  background-position:0 0,13px 13px;
+}
+/* 裏面の編集表示は従来どおり白地。 */
+body[data-side="back"] #stage { background:#fff; }
 </style>
 </head>
 <body>
@@ -247,7 +259,6 @@ const ASSET_PATHS = {
     frontBase:'assets/fan1-highres.png',
     backBase:'assets/fan-stamp.png?v=pink20261024',
     frontMask:'assets/fan-mask.png',
-    fanOutline:'assets/fan-outline.png',
     stamp01:'assets/01loveu.png',
     stamp02:'assets/02ntwithFace.png',
     stamp03:'assets/03eyestome.png',
@@ -267,7 +278,7 @@ const STAMPS = [
   ['stamp05','天使'],['stamp06','神'],['stamp07','尊い'],['stamp08','推し・ピンク'],
   ['stamp09','推し・イエロー'],['stamp10','推し・ブルー'],['stamp11','推し・グリーン'],['stamp12','投げキッスして']
 ];
-const HEADER_LOGO_KEY='headerLogo', FRONT_MASK_KEY='frontMask', FRONT_BASE_KEY='frontBase', FAN_OUTLINE_KEY='fanOutline', BACK_BASE_KEY='backBase';
+const HEADER_LOGO_KEY='headerLogo', FRONT_MASK_KEY='frontMask', FRONT_BASE_KEY='frontBase', BACK_BASE_KEY='backBase';
 const el=id=>document.getElementById(id), stage=el('stage'), sc=stage.getContext('2d');
 const pics={}; let photoImage=null, side='front', stampId=1, selected=null, stamps=[];
 let photo={x:512,y:330,scale:1,angle:0,bright:1,sat:1,contrast:1};
@@ -282,10 +293,10 @@ function loadImage(src){
 
 async function boot(){
   el('headerLogo').src = resolveAsset(HEADER_LOGO_KEY);
-  const keys=[FRONT_MASK_KEY,FRONT_BASE_KEY,FAN_OUTLINE_KEY,BACK_BASE_KEY,...STAMPS.map(([k])=>k)];
+  const keys=[FRONT_MASK_KEY,FRONT_BASE_KEY,BACK_BASE_KEY,...STAMPS.map(([k])=>k)];
   const settled=await Promise.allSettled(keys.map(key=>loadImage(key)));
   settled.forEach((result,i)=>{if(result.status==='fulfilled')pics[keys[i]]=result.value;});
-  const required=[FRONT_MASK_KEY,FRONT_BASE_KEY,FAN_OUTLINE_KEY,BACK_BASE_KEY];
+  const required=[FRONT_MASK_KEY,FRONT_BASE_KEY,BACK_BASE_KEY];
   const missingRequired=required.filter(k=>!pics[k]);
   for(const [key] of STAMPS){if(!pics[key]){
     document.querySelectorAll('[data-stamp-key="'+key+'"]').forEach(b=>{b.disabled=true;b.title='画像が見つからないため選択できません';});
@@ -336,8 +347,12 @@ function getLayer(outW,outH){
   return layerCache.get(key);
 }
 
-function drawFrontComposition(ctx,outW,outH){
-  ctx.save(); ctx.fillStyle='#fff'; ctx.fillRect(0,0,outW,outH);
+function drawFrontComposition(ctx,outW,outH,previewOnly=false){
+  ctx.save();
+  // 半透明部分が見えるよう、表面の編集プレビューだけ背景を透明にする。
+  // 印刷データ／サムネイルは従来どおり白背景で出力する。
+  if(previewOnly){ ctx.clearRect(0,0,outW,outH); }
+  else { ctx.fillStyle='#fff'; ctx.fillRect(0,0,outW,outH); }
   const layer=getLayer(outW,outH), l=layer.getContext('2d');
   l.setTransform(1,0,0,1,0,0); l.clearRect(0,0,outW,outH); l.setTransform(outW/CW,0,0,outH/CH,0,0);
   drawPhoto(l);
@@ -363,9 +378,9 @@ function drawBackComposition(ctx,outW,outH){
   ctx.restore();
 }
 
-function drawComposition(ctx,which,outW,outH){ if(which==='front') drawFrontComposition(ctx,outW,outH); else drawBackComposition(ctx,outW,outH); }
+function drawComposition(ctx,which,outW,outH,previewOnly=false){ if(which==='front') drawFrontComposition(ctx,outW,outH,previewOnly); else drawBackComposition(ctx,outW,outH); }
 function drawReceiptBand(ctx,outW,outH,displayCode){ if(!displayCode)return; ctx.save(); const scale=Math.min(outW/PRINT_W,outH/PRINT_H); const padX=32*scale,padY=16*scale; const font=Math.max(40*scale,15); ctx.font=`700 ${font}px system-ui,-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif`; const textW=ctx.measureText(displayCode).width; const bandH=font+padY*2, bandW=textW+padX*2; const x=Math.min(outW*0.66,outW*0.80-bandW), y=outH*0.80; ctx.fillStyle='rgba(255,255,255,0.90)'; ctx.fillRect(x,y,bandW,bandH); ctx.fillStyle='rgba(70,70,70,0.95)'; ctx.textBaseline='middle'; ctx.fillText(displayCode,x+padX,y+bandH/2); ctx.restore(); }
-function render(){ if(!ready)return; drawComposition(sc,side,CW,CH); }
+function render(){ if(!ready)return; drawComposition(sc,side,CW,CH,true); }
 function makePrintCanvas(which,displayCode=''){ const c=document.createElement('canvas'); c.width=PRINT_W; c.height=PRINT_H; const cx=c.getContext('2d'); drawComposition(cx,which,PRINT_W,PRINT_H); drawReceiptBand(cx,PRINT_W,PRINT_H,displayCode); return c; }
 function updateThumbs(){ if(!ready)return; for(const which of ['front','back']){ const c=document.createElement('canvas'); c.width=440; c.height=311; drawComposition(c.getContext('2d'),which,c.width,c.height); el(which+'Thumb').src=c.toDataURL('image/jpeg',0.78); } }
 
