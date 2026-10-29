@@ -344,7 +344,7 @@ function drawFrontComposition(ctx,outW,outH){
   l.filter='none'; l.globalCompositeOperation='destination-in'; l.drawImage(pics[FRONT_MASK_KEY],0,0,CW,CH); l.globalCompositeOperation='source-over';
   ctx.drawImage(layer,0,0);
   ctx.drawImage(pics[FRONT_BASE_KEY],0,0,outW,outH);
-  ctx.drawImage(pics[FAN_OUTLINE_KEY],0,0,outW,outH);
+  // fan-outline.png は使用せず、縁線なしで出力する。
   ctx.restore();
 }
 
@@ -359,7 +359,7 @@ function drawBackComposition(ctx,outW,outH){
     l.globalCompositeOperation='destination-in'; l.drawImage(pics[FRONT_MASK_KEY],0,0,CW,CH); l.globalCompositeOperation='source-over';
     ctx.drawImage(layer,0,0);
   }
-  ctx.drawImage(pics[FAN_OUTLINE_KEY],0,0,outW,outH);
+  // fan-outline.png は使用せず、縁線なしで出力する。
   ctx.restore();
 }
 
