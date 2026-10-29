@@ -349,10 +349,34 @@ function getLayer(outW,outH){
 
 function drawFrontComposition(ctx,outW,outH,previewOnly=false){
   ctx.save();
-  // 半透明部分が見えるよう、表面の編集プレビューだけ背景を透明にする。
-  // 印刷データ／サムネイルは従来どおり白背景で出力する。
-  if(previewOnly){ ctx.clearRect(0,0,outW,outH); }
-  else { ctx.fillStyle='#fff'; ctx.fillRect(0,0,outW,outH); }
+  if(previewOnly){
+    ctx.clearRect(0,0,outW,outH);
+    const photoLayer=getLayer(outW,outH), pctx=photoLayer.getContext('2d');
+    pctx.setTransform(1,0,0,1,0,0); pctx.clearRect(0,0,outW,outH); pctx.setTransform(outW/CW,0,0,outH/CH,0,0);
+    drawPhoto(pctx);
+    ctx.drawImage(photoLayer,0,0);
+
+    const guide=document.createElement('canvas'); guide.width=outW; guide.height=outH;
+    const g=guide.getContext('2d');
+    g.fillStyle='rgba(160,160,160,0.26)';
+    g.fillRect(0,0,outW,outH);
+    g.globalCompositeOperation='destination-out';
+    g.drawImage(pics[FRONT_MASK_KEY],0,0,outW,outH);
+    g.globalCompositeOperation='source-atop';
+    const step=Math.max(18,Math.round(outW/34));
+    for(let y=0;y<outH;y+=step){
+      for(let x=0;x<outW;x+=step){
+        g.fillStyle=((x/step+y/step)%2===0)?'rgba(255,255,255,0.10)':'rgba(110,110,110,0.07)';
+        g.fillRect(x,y,step,step);
+      }
+    }
+    ctx.drawImage(guide,0,0);
+    // プレビューでは写真全体を見せたまま、うちわ外側だけにガイドを重ねる。
+    // fan1-highres.png は印刷用の見た目に使用し、プレビューでは写真を消さないため重ねない。
+    ctx.restore();
+    return;
+  }
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,outW,outH);
   const layer=getLayer(outW,outH), l=layer.getContext('2d');
   l.setTransform(1,0,0,1,0,0); l.clearRect(0,0,outW,outH); l.setTransform(outW/CW,0,0,outH/CH,0,0);
   drawPhoto(l);
