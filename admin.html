@@ -52,10 +52,10 @@ h2{font-size:22px}
 </style></head><body><header><div class="wrap"><div><h1>大相撲安芸場所巡業｜うちわ受付管理</h1><span>表・裏のA4横印刷 ／ 受付・受け渡し</span></div><img src="assets/akibashofilter.png" alt="令和8年 秋巡業 大相撲安芸場所巡業" loading="lazy"></div></header>
 <div class="wrap"><div id="login" class="login"><h2>スタッフログイン</h2><p class="muted">Firebase Authenticationのスタッフ用メールアドレスでログインしてください。安芸場所の注文だけを表示します。閲覧・更新の権限はFirebaseのセキュリティルールでも許可されている必要があります。</p><label>メールアドレス<input id="email" type="email" autocomplete="username"></label><label>パスワード<input id="password" type="password" autocomplete="current-password"></label><p><button type="button" id="loginBtn" class="primary">ログイン</button></p><p id="loginError" class="err"></p></div>
 <div id="dashboard" class="hidden"><div class="toolbar"><div><h2 style="margin:0">注文一覧 <span class="count" id="count"></span></h2><div class="muted">会場ID: <span id="shopName"></span></div></div><div><select id="filter"><option value="ALL">全件</option><option value="WAIT">未印刷</option><option value="READY">印刷済み</option><option value="DONE">受渡済み</option></select> <button id="refresh">再読み込み</button> <button id="logout">ログアウト</button></div></div>
-<div class="help"><b>受渡後の削除：</b>商品をお渡しした後、「受渡済みにする」を押してください。受渡日時を記録します。受渡から24時間経過後の画像・注文情報の自動削除は、<b>Firebase側の削除処理が正しく設定・稼働している場合に限ります。</b>受渡前には押さないでください。<br><b>印刷方法：</b>「表・裏を２ページで印刷」を押すとA4横の２ページが開きます。表と裏を別々に印刷する場合は各ボタンを使用してください。実際の貼り合わせ方向は印刷テストでご確認ください。印刷設定は「A4・横・倍率100％・余白なし」を選び、用紙に合わせる自動拡大縮小をOFFにしてください。</div>
+<div class="help"><b>受渡後の削除：</b>商品をお渡しした後、「受渡済みにする」を押してください。受渡日時を記録します。受渡から24時間経過後の画像・注文情報の自動削除は、<b>Firebase側の削除処理が正しく設定・稼働している場合に限ります。</b>受渡前には押さないでください。<br><b>印刷方法：</b>「表・裏を２ページで印刷」を押すとA4横の２ページが開きます。表と裏を別々に印刷する場合は各ボタンを使用してください。実際の貼り合わせ方向は印刷テストでご確認ください。印刷設定は「A4・横・倍率100％・余白なし（または最小）」を選び、用紙に合わせる自動拡大縮小をOFFにしてください。</div>
 <section class="print-calibration" aria-label="印刷位置調整">
   <h3>うちわラベルシート用・印刷倍率・位置の補正</h3>
-  <p class="muted">Apeos C4570で普通紙に印刷し、ラベルシートと重ねて位置を確認してください。数値はこのパソコンのブラウザーに保存されます。ZIP内の原寸マスクと実物スキャンを照合済み。画像素材は変更せず、Apeos C4570での実測値に合わせて印刷する画像のみ暫定105.3％に補正します。表裏は別々に位置・倍率を調整できます。</p>
+  <p class="muted">Apeos C4570で普通紙に印刷し、ラベルシートと重ねて位置を確認してください。数値はこのパソコンのブラウザーに保存されます。ZIP内の原寸マスクと実物スキャンを照合済み。画像素材は変更せず、Apeos C4570での実測値に合わせて画像を用紙内のCanvasへ105.3％で描画します。画像が次ページへはみ出さない方式です。表裏は別々に位置・倍率を調整できます。</p>
   <div class="calibration-sides">
     <fieldset><legend>写真うちわ（表面）</legend>
       <label>左右位置（mm）<input id="calFrontX" type="number" min="-20" max="20" step="0.5" value="0"></label>
@@ -130,6 +130,8 @@ function wireCal(){
 wireCal();
 
 function printOrder(o,sides){
+  // 印刷領域から画像そのものがはみ出さないよう、105.3%拡大をCanvas内に焼き込む。
+  // レイアウト上のCanvasは常にA4 1ページ以内に収めるため、表裏が分割印刷されない。
   const w=window.open('','_blank');
   if(!w){alert('ポップアップを許可してください。');return}
   const images=sides.map(side=>({
@@ -139,19 +141,53 @@ function printOrder(o,sides){
     x:printCal[side].x,y:printCal[side].y,scale:printCal[side].scale/100
   }));
   const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  // img は絶対配置のためレイアウト上の高さを持たない。
-  // 版下の基準はA4原寸297x210mm。デバイスの95%縮小に対して中心基準で画像だけ105.3%に補正。
-  // 各ページ枠は209mmにして改ページ由来の白紙を抑制（うちわ外周は下端より十分内側）。
-  const sheet=images.map(x=>`<section class="page"><img class="sheet-art" src="${esc(x.url)}" alt="${esc(x.name)}" style="left:calc(148.5mm + ${x.x}mm);top:calc(105mm + ${x.y}mm);transform:translate(-50%,-50%) scale(${x.scale});"></section>`).join('');
+  const sheet=images.map((x,i)=>`<section class="page" aria-label="${esc(x.name)}"><canvas class="sheet-art" data-page="${i}" width="3508" height="2480" aria-label="${esc(x.name)}印刷データ"></canvas></section>`).join('');
   w.document.open();
-  w.document.write(`<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title>${esc(o.displayCode||o.id)} - 印刷</title>
-<style>@page{size:A4 landscape;margin:0}
-html,body{margin:0;padding:0;background:white}
-.page{display:block;width:100%;height:209mm;overflow:hidden;position:relative;break-inside:avoid;page-break-inside:avoid}
-.page+.page{break-before:page;page-break-before:always}
-.sheet-art{position:absolute;display:block;width:297mm;height:210mm;max-width:none;transform-origin:center center;object-fit:fill}
-@media screen{body{background:#ddd}.page{width:297mm;margin:8mm auto;background:#fff;box-shadow:0 0 8px #aaa}}
-</style></head><body>${sheet}<script>Promise.all(Array.from(document.images).map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve}))).then(()=>setTimeout(()=>window.print(),400));<\/script></body></html>`);
+  w.document.write(`<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title>${esc(o.displayCode||o.id)} - 表裏印刷</title>
+<style>
+  @page{size:A4 landscape;margin:0.5mm}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#fff}
+  /* 1ページ内で完結する固定サイズ。元のimgをCSSで105.3%拡大しない。 */
+  .page{width:296mm;height:209mm;overflow:hidden;display:flex;align-items:center;justify-content:center;break-inside:avoid;page-break-inside:avoid;page-break-after:always;break-after:page}
+  .page:last-of-type{page-break-after:auto;break-after:auto}
+  .sheet-art{display:block;width:295.65mm;height:209mm;max-width:none;flex:none}
+  #printError{display:none;color:#a22;font-size:16px;font-weight:bold;padding:12px}
+  @media screen{body{background:#ddd;padding:10px 0}.page{background:white;margin:8mm auto;box-shadow:0 0 8px #aaa}#printError{background:white;max-width:297mm;margin:auto}}
+</style></head><body><p id="printError" role="alert"></p>${sheet}</body></html>`);
   w.document.close();
+
+  // 外部画像を一旦読み込み、拡大・位置補正を用紙サイズのキャンバス内に描画する。
+  // Canvasは常に固定サイズなので、拡大によって印刷ページが増えることはない。
+  (async()=>{
+    try{
+      await Promise.all(images.map(async (x,i)=>{
+        const img=new w.Image();
+        img.src=x.url;
+        await new Promise((resolve,reject)=>{
+          if(img.complete){return img.naturalWidth>0?resolve():reject(new Error(x.name+'の画像を読み込めませんでした'))}
+          img.onload=resolve;
+          img.onerror=()=>reject(new Error(x.name+'の画像を読み込めませんでした'));
+        });
+        if(w.closed) return;
+        const canvas=w.document.querySelector(`canvas[data-page="${i}"]`);
+        const ctx=canvas.getContext('2d',{alpha:false});
+        if(!ctx)throw new Error('印刷用画像を作成できませんでした');
+        const pw=canvas.width,ph=canvas.height;
+        ctx.fillStyle='#fff';ctx.fillRect(0,0,pw,ph);
+        const drawW=pw*x.scale,drawH=ph*x.scale;
+        const shiftX=x.x*pw/297,shiftY=x.y*ph/210;
+        ctx.drawImage(img,(pw-drawW)/2+shiftX,(ph-drawH)/2+shiftY,drawW,drawH);
+      }));
+      if(w.closed)return;
+      await new Promise(resolve=>w.requestAnimationFrame(()=>w.requestAnimationFrame(resolve)));
+      await new Promise(resolve=>setTimeout(resolve,350));
+      if(w.closed)return;
+      w.focus();w.print();
+    }catch(e){
+      console.error('うちわの印刷データ作成に失敗:',e);
+      if(!w.closed){const box=w.document.getElementById('printError');box.textContent='画像の準備に失敗したため印刷を中止しました。管理画面へ戻り再読み込みしてください。詳細: '+e.message;box.style.display='block';}
+    }
+  })();
 }
 </script></body></html>
