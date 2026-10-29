@@ -315,12 +315,10 @@ body.has-photo #frontStep #photoStart{display:none!important}
 .finish-monitor-state.is-done{color:#26754c;font-weight:800}
 .finish-monitor-note{font-size:11px;line-height:1.4;color:#776b60;margin:7px 2px 0}
 .transfer-meter{background:#fff8ea;border:1px solid #ebd7af;border-radius:12px;padding:12px;margin:12px 0 0;color:#63421f}
-.transfer-row,.transfer-speed-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px}
+.transfer-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px}
 #transferPercent{font-size:19px;font-variant-numeric:tabular-nums}
-.transfer-track,.transfer-speed-track{width:100%;border-radius:99px;overflow:hidden;background:#e9decb}
+.transfer-track{width:100%;border-radius:99px;overflow:hidden;background:#e9decb}
 .transfer-track{height:12px;margin:7px 0 11px}.transfer-fill{height:100%;width:0;background:#a96b22;transition:width .18s}
-.transfer-speed-track{height:6px;margin:7px 0 0}.transfer-speed-fill{height:100%;width:0;background:#4d8ba6;transition:width .2s}
-#transferSpeed{font-size:15px;font-variant-numeric:tabular-nums}
 .transfer-note{font-size:11px;margin:7px 0 0;color:#77685b}
 @media(max-width:440px){.workflow .correction-box{padding:9px}.correction-slider{grid-template-columns:65px minmax(0,1fr) 42px;gap:6px}.finish-monitor{padding:9px}.finish-monitor-grid{gap:6px}.finish-monitor-side{padding:5px}.finish-monitor-label{font-size:12px}}
 </style>
@@ -445,8 +443,6 @@ body.has-photo #frontStep #photoStart{display:none!important}
           <section class="transfer-meter" id="transferMeter" hidden aria-label="画像の送信状況" role="status" aria-live="off">
             <div class="transfer-row"><strong id="transferPhase">画像データを送信中</strong><strong id="transferPercent">0%</strong></div>
             <div class="transfer-track" id="transferProgress" role="progressbar" aria-label="表裏画像の転送進捗" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="transferFill" class="transfer-fill"></div></div>
-            <div class="transfer-speed-row"><span>通信速度（実測）</span><strong id="transferSpeed">計測中…</strong></div>
-            <div class="transfer-speed-track" aria-hidden="true"><div id="transferSpeedFill" class="transfer-speed-fill"></div></div>
             <p class="transfer-note" id="transferNote">完了までこの画面を閉じないでください。</p>
           </section>
           <div id="pendingRecovery" class="pending-recovery" role="group" aria-label="未確定の注文を確認">
@@ -897,23 +893,26 @@ async function checkPending(){
   }catch(e){status(e.message||'受付状況を確認できませんでした。','error');}
   finally{b.disabled=false;}
 }
-// 二つの画像を合算し、Firebase Storageから報告される転送バイト数で進捗・通信速度を算出。
-// 回線の公称速度ではなく、この注文の実際のアップロード実効速度を表示する。
+// 表裏の画像を合算し、Firebase Storage が報告する送信済みバイト数から進捗率だけを表示する。
 let transferState=null;
-function resetTransfer(total){transferState={total,front:0,back:0,lastBytes:0,lastTime:performance.now(),speed:0};el('transferMeter').hidden=false;updateTransferMeter('送信の準備中…',0);}
-function updateTransferMeter(phase,speedOverride){
+function resetTransfer(total){
+  transferState={total,front:0,back:0};
+  el('transferMeter').hidden=false;
+  updateTransferMeter('送信の準備中…');
+}
+function updateTransferMeter(phase){
   const s=transferState;if(!s)return;
-  const bytes=s.front+s.back,pct=s.total?Math.min(100,Math.floor(bytes/s.total*100)):0;
-  el('transferPhase').textContent=phase;el('transferPercent').textContent=pct+'%';el('transferFill').style.width=pct+'%';
+  const bytes=s.front+s.back;
+  const pct=s.total?Math.min(100,Math.floor(bytes/s.total*100)):0;
+  el('transferPhase').textContent=phase;
+  el('transferPercent').textContent=pct+'%';
+  el('transferFill').style.width=pct+'%';
   el('transferProgress').setAttribute('aria-valuenow',String(pct));
-  const mbps=speedOverride??s.speed;el('transferSpeed').textContent=mbps>0?mbps.toFixed(2)+' MB/秒':'計測中…';
-  el('transferSpeedFill').style.width=(Math.min(mbps/10,1)*100).toFixed(1)+'%';
-  el('transferNote').textContent='速度バーは10 MB/秒を上限として表示（実測速度：'+(mbps>0?mbps.toFixed(2)+' MB/秒':'計測中')+'）。';
+  el('transferNote').textContent='完了までこの画面を閉じないでください。';
 }
 function updateTransferBytes(which,bytes,phase){
   const s=transferState;if(!s)return;
-  s[which]=bytes;const now=performance.now(),total=s.front+s.back,dt=now-s.lastTime,delta=total-s.lastBytes;
-  if(dt>90&&delta>0){const instantaneous=delta/(dt/1000)/(1024*1024);s.speed=s.speed?instantaneous*.55+s.speed*.45:instantaneous;s.lastBytes=total;s.lastTime=now;}
+  s[which]=bytes;
   updateTransferMeter(phase);
 }
 function hideTransferMeter(){el('transferMeter').hidden=true;transferState=null;}
