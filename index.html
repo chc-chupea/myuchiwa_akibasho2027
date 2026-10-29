@@ -193,6 +193,105 @@ body[data-side="back"] .back-start{border-color:#eba9ca!important}
  .side-step-status{font-size:10px}
 }
 
+
+/* 2026-10-29: 表・裏それぞれ1画面で完結するコンパクトな制作フロー */
+[hidden]{display:none!important}
+.workflow-nav{max-width:770px;margin:0 auto 10px;padding:11px 12px 10px;border:1px solid #e5d9ca;border-radius:16px;background:#fff}
+.workflow-caption{margin:0 0 8px;text-align:center;font-size:14px;line-height:1.4;color:#5a4e44}
+.workflow-caption b{color:#76401d}
+.workflow-tabs{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.workflow-tab{display:flex;align-items:center;gap:9px;min-width:0;min-height:64px;padding:8px 11px;border:2px solid #e5dfd6;border-radius:12px;background:#fafafa;text-align:left;box-shadow:none}
+.workflow-tab.is-front{background:#f4fafd}.workflow-tab.is-back{background:#fff5f9}
+.workflow-tab.is-front.active{border-color:#2e879a;box-shadow:0 0 0 1px #2e879a22}
+.workflow-tab.is-back.active{border-color:#c34e82;box-shadow:0 0 0 1px #c34e8222}
+.workflow-tab-icon{font-size:23px;flex:none}
+.workflow-tab-label{display:flex;flex-direction:column;min-width:0;line-height:1.25;gap:4px}
+.workflow-tab-label strong{font-size:16px;white-space:nowrap;color:#3b3029}
+.workflow-tab-label small{font-size:12px;font-weight:800;color:#826344}
+.workflow-tab.is-complete small{color:#267251}
+.workflow{max-width:770px;margin:0 auto}
+.work-step{display:flex;flex-direction:column;gap:9px}
+.work-step > .panel{margin:0;overflow:hidden;box-shadow:0 3px 12px rgba(68,43,23,.045)}
+.workflow .photo-start,.workflow .back-start{display:block!important;background:#fff;border:1px solid #e4d6c6;border-radius:16px;padding:12px 14px 11px;margin:0;box-shadow:none;text-align:left}
+.work-title{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.work-num{display:flex;align-items:center;justify-content:center;flex:none;width:30px;height:30px;font-weight:900;background:#e4f3f6;color:#27798c;border-radius:50%;font-size:17px}
+.work-num.back-num{background:#ffe7f0;color:#bd386d}
+.workflow .photo-start-title,.workflow .back-start-heading{display:block;margin:0 0 2px;font-size:20px;line-height:1.3;text-align:left;color:#442c20}
+.workflow .photo-start-hint,.workflow .back-start-lead{display:block;margin:0;font-size:13px;line-height:1.4;text-align:left;color:#6e6154}
+.workflow #photoStart.is-ready .photo-start-title,.workflow #photoStart.is-ready .photo-start-hint{display:block}
+.workflow #photoStart.is-ready .photo-actions{display:none!important}
+.workflow #photoStart .photo-start-ready{display:none;margin:4px 0 0;font-size:13px}
+.workflow #photoStart.is-ready .photo-start-ready{display:block}
+.workflow .photo-start .photo-actions{margin:10px 0 0}
+.workflow .photo-action{min-height:48px;padding:8px 7px;border-radius:10px;font-size:15px;line-height:1.3;box-shadow:none}
+.workflow .photo-action-icon{font-size:19px}
+.workflow .preview-slot{display:block}
+.workflow .preview-panel{position:static;top:auto;margin:0;box-shadow:0 3px 13px rgba(68,43,23,.05);border-radius:16px}
+.workflow .preview-panel .preview-heading{padding:9px 12px 4px;border-bottom:none}
+.workflow .preview-panel .preview-heading h2{font-size:17px;margin:0}
+.workflow .preview-panel .preview-heading p{display:none}
+.workflow .stage-wrap{margin:5px 10px 5px;border-width:1px;border-radius:11px}
+.workflow .stage-caption{padding:0 11px 5px;font-size:12px;line-height:1.35}
+.workflow .stage-caption b{font-size:12px}
+.workflow .gesture-note{padding:5px 8px;margin:0 10px 7px;font-size:12px;line-height:1.3;font-weight:750}
+.workflow .action-footer{padding:6px 10px 8px;gap:8px}
+.workflow .action-footer .btn{min-height:36px;padding:5px 8px;font-size:13px;border-radius:9px}
+.workflow .touch-tools{gap:5px;padding:0 10px 8px}
+.workflow .touch-btn{min-height:48px;padding:4px}
+.workflow .edit-panel{margin:0}
+.workflow .edit-panel .edit-body{padding:10px 12px}
+.workflow .front-photo-controls{display:none}
+body.has-photo .workflow .front-photo-controls{display:block}
+.workflow .ctrlbox{padding:9px 10px;margin:0 0 8px;border-radius:12px}
+.workflow .eyeline{margin:0 0 7px;font-size:14px}
+.workflow .optional-note{font-size:12px;font-weight:600;color:#74685f}
+.workflow .ctrlrow{gap:8px;flex-wrap:nowrap}
+.workflow .ctrlrow>button{min-width:0}
+.workflow .btn{min-height:42px;padding:8px 12px;border-radius:10px;font-size:15px}
+.workflow .reselect-area{border-top:1px solid #eee6da;padding:8px 0 3px}
+.workflow .photo-actions-editor{margin:0}
+.workflow .next-step{display:block;width:100%;margin:7px 0 0;min-height:46px;font-size:16px}
+.workflow .back-start .stamp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:6px 0 0}
+.workflow .back-start .back-more-grid:not(.is-open){display:none!important}
+.workflow .back-start .stamp-btn{height:86px;padding:4px 3px 26px;border-radius:10px}
+.workflow .back-start .stamp-btn span{font-size:11px;line-height:1.1}
+.workflow .back-more-btn{min-height:40px;margin:8px 0 0;padding:7px 10px;font-size:13px;border-radius:9px}
+.workflow .back-pick-status{margin:0;color:#286d4a;font-size:13px}
+.workflow .back-step-actions{display:grid;grid-template-columns:1fr auto;gap:8px}
+.workflow .back-step-actions .next-step{margin:0}
+.workflow .back-to-front{font-size:13px;min-height:46px}
+.workflow .order-panel{margin-top:11px}
+.workflow .order-panel .section-head{padding:11px 13px 8px}
+.workflow .order-panel .section-head h2{font-size:18px}
+.workflow .order-panel .section-head p{font-size:13px}
+.workflow .order-panel .edit-body{padding:13px}
+.workflow .order-panel .total{margin:10px 0}
+.workflow .order-panel .submit{min-height:60px}
+@media(max-width:870px){
+ header .header-logo{max-height:62px;max-width:260px;object-fit:contain;margin:5px auto 0}
+ header{padding:8px 0 10px}
+ header h1{font-size:21px}
+ header p{font-size:13px}
+ main.wrap{padding-top:9px}
+ .workflow .photo-start,.workflow .back-start{display:block!important}
+ .workflow .back-start .stamp-grid{display:grid}
+ .workflow .back-start .back-more-grid:not(.is-open){display:none!important}
+ .workflow .preview-panel .preview-heading{display:block}
+ .workflow .preview-panel .editing-eyebrow{margin-bottom:2px}
+ .workflow .stage-wrap{margin:5px 10px 5px}
+ .workflow .edit-panel .edit-body{padding:10px 12px}
+ .workflow .photo-action{min-height:48px;font-size:14px}
+ .workflow .back-step-actions{grid-template-columns:1fr auto}
+ .workflow .back-to-front{padding:8px 7px}
+}
+@media(max-width:370px){
+ .workflow-tab{padding:7px;gap:6px}
+ .workflow-tab-label strong{font-size:14px}
+ .workflow-tab-icon{display:none}
+ .workflow .back-step-actions{grid-template-columns:1fr}
+}
+
+body.has-photo #frontStep #photoStart{display:none!important}
 </style>
 </head>
 <body>
@@ -207,54 +306,68 @@ body[data-side="back"] .back-start{border-color:#eba9ca!important}
 <main class="wrap">
   <input class="visually-hidden-file" id="cameraInput" type="file" accept="image/*" capture="environment" aria-label="カメラで写真を撮影">
   <input class="visually-hidden-file" id="photoInput" type="file" accept="image/*" aria-label="ライブラリの写真を選択">
-  <section class="side-overview" aria-label="うちわの表と裏を作ろう">
-    <div class="overview-heading">
-      <div class="overview-kicker">MY FAN · TWO SIDES</div>
-      <h2>表も、裏も。自分だけのうちわを作ろう！</h2>
-      <p>① 表に記念写真を入れて、② 裏に推し活スタンプを選ぼう。</p>
-    </div>
-    <div class="mini-panels side-steps" role="group" aria-label="表面と裏面の切り替え">
-      <button type="button" id="miniFront" class="mini side-step side-step-front active" aria-pressed="true" aria-label="表面・記念写真を編集する">
-        <span class="side-step-title"><span class="step-number">1</span><span><strong>表 <span class="step-theme">記念写真</span></strong><small>思い出を写真に</small></span><span class="step-icon" aria-hidden="true">📷</span></span>
-        <span class="side-step-visual"><img id="frontThumb" alt="表面・記念写真うちわの仕上がりプレビュー"></span>
-        <span class="side-step-bottom"><span class="side-step-status" id="frontDoneBadge">写真を選ぶ</span><span class="step-go">編集する ›</span></span>
+
+  <nav class="workflow-nav" aria-label="両面うちわの制作手順">
+    <p class="workflow-caption">表は写真、裏は推し活。<b>2つの面を作って完成！</b></p>
+    <div class="workflow-tabs">
+      <button type="button" id="miniFront" class="workflow-tab is-front active" aria-pressed="true">
+        <span class="workflow-tab-icon" aria-hidden="true">📷</span>
+        <span class="workflow-tab-label"><strong>① 表｜記念写真</strong><small id="frontDoneBadge">写真を選ぶ</small></span>
       </button>
-      <button type="button" id="miniBack" class="mini side-step side-step-back" aria-pressed="false" aria-label="裏面・推し活うちわを編集する">
-        <span class="side-step-title"><span class="step-number">2</span><span><strong>裏 <span class="step-theme">推し活</span></strong><small>推しへの気持ちを</small></span><span class="step-icon" aria-hidden="true">💖</span></span>
-        <span class="side-step-visual"><img id="backThumb" alt="裏面・推し活スタンプうちわの仕上がりプレビュー"></span>
-        <span class="side-step-bottom"><span class="side-step-status" id="backDoneBadge">スタンプを選ぶ</span><span class="step-go">編集する ›</span></span>
+      <button type="button" id="miniBack" class="workflow-tab is-back" aria-pressed="false">
+        <span class="workflow-tab-icon" aria-hidden="true">💗</span>
+        <span class="workflow-tab-label"><strong>② 裏｜推し活</strong><small id="backDoneBadge">スタンプを選ぶ</small></span>
       </button>
     </div>
-    <p class="overview-footnote">表の写真 ＋ 裏の推し活スタンプ ＝ <b>両面オリジナルうちわ</b></p>
-  </section>
+  </nav>
 
-  <section class="photo-start" id="photoStart" aria-label="最初に写真を選ぶ">
-    <h2 class="photo-start-title">① 表｜記念写真を作る</h2>
-    <p class="photo-start-hint">はじめに、うちわの表に入れる写真を選ぼう</p>
-    <p class="photo-start-ready" id="photoStartReady" role="status">✓ 写真が入りました</p>
-    <div class="photo-actions" role="group" aria-label="写真の入れ方">
-      <button type="button" class="photo-action" id="cameraStart"><span class="photo-action-icon" aria-hidden="true">📷</span>カメラを起動</button>
-      <button type="button" class="photo-action" id="libraryStart"><span class="photo-action-icon" aria-hidden="true">▣</span>ライブラリの写真を選択</button>
+  <div class="workflow" id="workflow">
+    <div id="frontStep" class="work-step">
+      <section class="panel photo-start" id="photoStart" aria-label="表面の記念写真を選ぶ">
+        <div class="work-title"><span class="work-num">1</span><div><h2 class="photo-start-title">表｜記念写真を作る</h2><p class="photo-start-hint">まず写真を選んで、うちわに配置しよう</p></div></div>
+        <p class="photo-start-ready" id="photoStartReady" role="status">✓ 写真を選択済み。下の仕上がりで調整できます。</p>
+        <div class="photo-actions" role="group" aria-label="写真の入れ方">
+          <button type="button" class="photo-action" id="cameraStart"><span class="photo-action-icon" aria-hidden="true">📷</span>カメラを起動</button>
+          <button type="button" class="photo-action" id="libraryStart"><span class="photo-action-icon" aria-hidden="true">▣</span>ライブラリから選ぶ</button>
+        </div>
+      </section>
+      <div id="frontPreviewSlot" class="preview-slot"></div>
+      <section class="panel edit-panel" aria-label="表面の写真の調整">
+        <div class="edit-body" id="frontEditor" >
+          <div class="front-photo-controls">
+            <div class="ctrlbox"><div class="eyeline">✨ 写真をきれいにする <span class="optional-note">（お好みで）</span></div>
+              <div class="ctrlrow"><button type="button" class="btn primary" id="autoAdjust">おまかせ補正</button><button type="button" class="btn" id="adjustReset">補正を戻す</button></div>
+            </div>
+            <div class="reselect-area" id="reselectGroup">
+              <div class="eyeline">写真をえらび直す</div>
+              <div class="photo-actions photo-actions-editor" role="group" aria-label="写真をえらび直す">
+                <button type="button" class="photo-action" id="cameraEditor"><span class="photo-action-icon" aria-hidden="true">📷</span>撮り直す</button>
+                <button type="button" class="photo-action" id="libraryEditor"><span class="photo-action-icon" aria-hidden="true">▣</span>写真を選び直す</button>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn primary next-step" id="nextBack">② 裏の推し活うちわを作る →</button>
+        </div>
+      </section>
     </div>
-  </section>
 
-  <section class="back-start" id="backStart" aria-label="裏面のスタンプを選ぶ">
-    <h2 class="back-start-heading">② 裏｜推し活うちわを作る</h2>
-    <p class="back-start-lead">好きな推し活スタンプを1つ選ぶだけ！</p>
-    <p class="back-pick-status" id="backPickStatus" role="status" aria-live="polite"></p>
-    <div class="stamp-grid" id="quickStampGrid" aria-label="おすすめのスタンプ６種類"></div>
-    <div class="stamp-grid back-more-grid" id="moreStampGrid" aria-label="その他のスタンプ６種類"></div>
-    <button type="button" class="back-more-btn" id="toggleMoreStamps" aria-expanded="false" aria-controls="moreStampGrid">＋ ほかのスタンプを見る（６種類）</button>
-  </section>
+    <div id="backStep" class="work-step" hidden>
+      <section class="panel back-start" id="backStart" aria-label="裏面のスタンプを選ぶ">
+        <div class="work-title"><span class="work-num back-num">2</span><div><h2 class="back-start-heading">裏｜推し活うちわを作る</h2><p class="back-start-lead">好きなスタンプを1つ選ぶだけ！</p></div></div>
+        <p class="back-pick-status" id="backPickStatus" role="status" aria-live="polite"></p>
+        <div class="stamp-grid" id="quickStampGrid" aria-label="おすすめのスタンプ6種類"></div>
+        <div class="stamp-grid back-more-grid" id="moreStampGrid" aria-label="その他のスタンプ6種類"></div>
+        <button type="button" class="back-more-btn" id="toggleMoreStamps" aria-expanded="false" aria-controls="moreStampGrid">＋ ほかのスタンプを見る（6種類）</button>
+      </section>
+      <div id="backPreviewSlot" class="preview-slot"></div>
+      <div class="back-step-actions"><button type="button" class="btn primary next-step" id="goOrder">③ 注文へ進む ↓</button><button type="button" class="btn back-to-front" id="backToFront">← 表の写真を直す</button></div>
+    </div>
 
-  <div class="intro"><b>表は記念写真、裏は推し活。</b><small>2つのデザインが揃ったら、③注文へ進もう。</small></div>
-
-  <div class="layout">
-    <section class="panel preview-panel" aria-label="うちわのプレビュー">
-      <div class="section-head preview-heading"><span class="editing-eyebrow">いま編集中 <b id="previewSideTag">① 表面</b></span><h2 id="previewTitle">表｜記念写真の仕上がり</h2><p>表は写真を動かして調整、裏はスタンプを選ぶだけ。</p></div>
+    <section class="panel preview-panel" id="previewPanel" aria-label="現在編集中のうちわの仕上がり">
+      <div class="section-head preview-heading"><span class="editing-eyebrow">いま編集中 <b id="previewSideTag">① 表面</b></span><h2 id="previewTitle">表｜記念写真の仕上がり</h2><p>仕上がりを確認しながら調整できます。</p></div>
       <div class="stage-wrap"><canvas id="stage" width="1024" height="725" aria-label="うちわ編集キャンバス"></canvas></div>
       <div class="stage-caption"><span id="stageHelp" role="status">写真を選ぶと、ここに表示されます。</span><b id="stageSide">表｜記念写真</b></div>
-      <div class="gesture-note" id="gestureNote">☝️ １本指で動かす　✌️ ２本指で大きさ・回転</div>
+      <div class="gesture-note" id="gestureNote">☝️ 指で移動　✌️ 2本指で拡大・回転</div>
       <div class="touch-tools" id="touchTools" aria-label="指の操作が難しいときのボタン">
         <button class="touch-btn" type="button" id="smallerBtn" aria-label="小さくする">－<span>小さく</span></button>
         <button class="touch-btn" type="button" id="biggerBtn" aria-label="大きくする">＋<span>大きく</span></button>
@@ -264,36 +377,15 @@ body[data-side="back"] .back-start{border-color:#eba9ca!important}
       <div class="action-footer"><button type="button" class="btn" id="undoBtn">↶ ひとつ戻す</button><button type="button" class="btn" id="redoBtn">↷ やり直す</button></div>
     </section>
 
-    <div>
-      <section class="panel edit-panel" aria-label="デザイン編集">
-        <div class="section-head"><h2 id="editorTitle">① 表｜記念写真を調整</h2><p id="editorDesc">会場で撮った写真を選びましょう。</p></div>
-        <div class="edit-body">
-          <div class="edit-block active" id="frontEditor">
-            <div class="photo-actions photo-actions-editor" role="group" aria-label="写真の入れ方">
-              <button type="button" class="photo-action" id="cameraEditor"><span class="photo-action-icon" aria-hidden="true">📷</span>カメラを起動</button>
-              <button type="button" class="photo-action" id="libraryEditor"><span class="photo-action-icon" aria-hidden="true">▣</span>ライブラリの写真を選択</button>
-            </div>
-            <div class="subhint">写真はうちわの上で指を動かして位置を調整できます。<br>２本指で大きさや角度も変えられます。</div>
-            <div class="ctrlbox">
-              <div class="eyeline">写真をきれいにする（お好みで）</div>
-              <div class="ctrlrow"><button type="button" class="btn primary" id="autoAdjust">✨ 写真をきれいに</button><button type="button" class="btn" id="adjustReset">補正を戻す</button></div>
-            </div>
-            <button type="button" class="btn primary" id="nextBack" style="display:block;width:100%;margin-top:14px">② 裏の推し活うちわを作る →</button>
-          </div>
+    <!-- 旧スクリプトとの互換性を保つため、非表示のプレビュー画像と制御要素を保持 -->
+    <div id="legacyCompat" hidden>
+      <img id="frontThumb" alt="表面の仕上がり"><img id="backThumb" alt="裏面の仕上がり">
+      <div id="backEditor"><div id="stampGrid"></div><div id="stampControls" class="done-tip"></div><div id="stampEmpty"></div></div>
+      <span id="editorTitle"></span><span id="editorDesc"></span>
+    </div>
 
-          <div class="edit-block" id="backEditor">
-            <div class="eyeline">② 裏の推し活スタンプを１つ選ぶ</div>
-            <div class="subhint">スタンプを押すと、裏面の中央より少し下に大きく入ります。<br>裏面は動かさず、スタンプの種類を選ぶイメージです。</div>
-            <div class="stamp-grid" id="stampGrid"></div>
-            <div id="stampControls" class="done-tip" role="status">スタンプを選びました。裏面に大きく入りました。</div>
-            <div id="stampEmpty" class="empty-select">好きなスタンプを１つ押してみてください。</div>
-
-          </div>
-        </div>
-      </section>
-
-      <section class="panel order-panel" id="orderPanel">
-        <div class="section-head"><h2>③ 両面を確認して注文する</h2><p>表：記念写真 ＋ 裏：推し活うちわ。両方できたら注文へ！</p></div>
+    <section class="panel order-panel" id="orderPanel">
+        <div class="section-head"><h2>③ 注文する</h2><p>表は記念写真、裏は推し活スタンプ。仕上がりを確認したら注文へ。</p></div>
         <div class="edit-body">
           <div class="order-grid">
             <div class="field"><label for="customerName">お名前（書かなくても大丈夫です）</label><input id="customerName" type="text" maxlength="30" autocomplete="nickname" placeholder="例：はなこ"></div>
@@ -313,7 +405,6 @@ body[data-side="back"] .back-start{border-color:#eba9ca!important}
           <div class="tiny" style="margin-top:12px">お店では表面と裏面の２枚を印刷します。お客様が画像を保存する必要はありません。</div>
         </div>
       </section>
-    </div>
   </div>
 
   <footer class="footer">AKI BASHO FAN · Event edition ／ 個人情報はうちわの制作・受け渡しにのみ使用します。自動削除機能は店舗のFirebase設定後に有効になります。</footer>
@@ -490,7 +581,7 @@ function makePrintCanvas(which,displayCode=''){ const c=document.createElement('
 function updateThumbs(){ if(!ready)return; for(const which of ['front','back']){ const c=document.createElement('canvas'); c.width=440; c.height=311; drawComposition(c.getContext('2d'),which,c.width,c.height); el(which+'Thumb').src=c.toDataURL('image/jpeg',0.78); } }
 
 function updateSideProgress(){
-  const states=[['front',!!photoImage,'写真が入りました','写真を選ぶ'],['back',!!currentStamp(),'スタンプOK','スタンプを選ぶ']];
+  const states=[['front',!!photoImage,'写真OK','写真を選ぶ'],['back',!!currentStamp(),'スタンプOK','スタンプを選ぶ']];
   for(const [name,done,okLabel,waitingLabel] of states){
     const button=el(name==='front'?'miniFront':'miniBack');
     const badge=el(name==='front'?'frontDoneBadge':'backDoneBadge');
@@ -501,20 +592,26 @@ function updateSideProgress(){
 function switchSide(which){
   if(!['front','back'].includes(which))return;
   side=which; document.body.dataset.side=which;
-  ['Front','Back'].forEach(v=>{
-    const x=v.toLowerCase(),active=which===x,button=el('mini'+v);
+  const isFront=which==='front';
+  el('frontStep').hidden=!isFront;
+  el('backStep').hidden=isFront;
+  el('orderPanel').hidden=isFront;
+  el(isFront?'frontPreviewSlot':'backPreviewSlot').appendChild(el('previewPanel'));
+  for(const name of ['Front','Back']){
+    const active=which===name.toLowerCase(), button=el('mini'+name);
     button.classList.toggle('active',active);
     button.setAttribute('aria-pressed',String(active));
-    el(x+'Editor').classList.toggle('active',active);
-  });
-  el('editorTitle').textContent = which==='front' ? '① 表｜記念写真を調整' : '② 裏｜推し活スタンプを選ぶ';
-  el('editorDesc').textContent = which==='front' ? '思い出の写真をうちわに入れよう。' : '推し活スタンプを1つ選ぶだけです。';
-  el('previewTitle').textContent = which==='front' ? '表｜記念写真の仕上がり' : '裏｜推し活うちわの仕上がり';
-  el('previewSideTag').textContent = which==='front' ? '① 表面' : '② 裏面';
-  el('stageSide').textContent = which==='front' ? '表｜記念写真' : '裏｜推し活';
-  el('stageHelp').textContent = which==='front' ? (photoImage ? '写真を指で動かせます。' : 'まず写真を選んでください。') : (currentStamp() ? 'スタンプが中央より少し下に入っています。' : '好きなスタンプを選んでください。');
-  updateSideProgress();updateUndo(); updateTouchTools(); render();
+  }
+  el('editorTitle').textContent = isFront ? '① 表｜記念写真を調整' : '② 裏｜推し活スタンプを選ぶ';
+  el('editorDesc').textContent = isFront ? '思い出の写真をうちわに入れよう。' : '推し活スタンプを1つ選ぶだけです。';
+  el('previewTitle').textContent = isFront ? '表｜記念写真の仕上がり' : '裏｜推し活うちわの仕上がり';
+  el('previewSideTag').textContent = isFront ? '① 表面' : '② 裏面';
+  el('stageSide').textContent = isFront ? '表｜記念写真' : '裏｜推し活';
+  el('stageHelp').textContent = isFront ? (photoImage ? '写真を指で動かせます。' : 'まず写真を選んでください。') : (currentStamp() ? '選んだスタンプの仕上がりです。' : '好きなスタンプを選んでください。');
+  document.body.classList.toggle('has-photo',!!photoImage);
+  updateSideProgress(); updateUndo(); updateTouchTools(); render();
 }
+
 function updateTouchTools(){
   const active = side==='front' && !!photoImage;
   for(const id of ['smallerBtn','biggerBtn','rotateBtn','resetThingBtn']){ const b=el(id); if(b)b.disabled=!active; }
@@ -532,6 +629,7 @@ function addStamp(key){
   el('stageHelp').textContent='「'+label+'」を選びました。裏面の中央より少し下に大きく入りました。';
   el('backPickStatus').textContent='✓ 「'+label+'」を選びました';
   switchSide('back'); render(); updateThumbs();
+  if(window.matchMedia('(max-width:870px)').matches) easyScrollTo('backPreviewSlot','start');
 }
 
 function posFromEvent(e){ const rect=stage.getBoundingClientRect(); return {x:(e.clientX-rect.left)*CW/rect.width, y:(e.clientY-rect.top)*CH/rect.height}; }
@@ -729,7 +827,9 @@ function rotateTarget(){ if(side!=='front' || !photoImage)return; saveUndo(); ph
 function resetTarget(){ if(side!=='front' || !photoImage)return; saveUndo(); Object.assign(photo,{x:512,y:330,scale:1,angle:0}); render(); updateThumbs(); }
 
 function wire(){
-  el('miniFront').onclick=()=>{ switchSide('front'); if(window.matchMedia('(max-width:870px)').matches && !photoImage)easyScrollTo('photoStart','start');else scrollToStage(); }; el('miniBack').onclick=()=>{ switchSide('back'); showBackPicker(); };
+  el('miniFront').onclick=()=>{ switchSide('front'); easyScrollTo(photoImage?'frontPreviewSlot':'photoStart','start'); }; el('miniBack').onclick=()=>{ switchSide('back'); showBackPicker(); };
+  el('backToFront').onclick=()=>{switchSide('front');easyScrollTo(photoImage?'frontPreviewSlot':'photoStart','start');};
+  el('goOrder').onclick=()=>easyScrollTo('orderPanel','start');
   el('nextBack').onclick=()=>{ switchSide('back'); showBackPicker(); };
   el('toggleMoreStamps').onclick=()=>{ const grid=el('moreStampGrid'), expanded=!grid.classList.contains('is-open'); grid.classList.toggle('is-open',expanded); el('toggleMoreStamps').setAttribute('aria-expanded',String(expanded)); el('toggleMoreStamps').textContent=expanded?'－ ほかのスタンプを閉じる':'＋ ほかのスタンプを見る（６種類）'; };
   el('undoBtn').onclick=undo; el('redoBtn').onclick=redo;
@@ -758,7 +858,7 @@ function wire(){
   updateUndo(); updateStampControls(); updateTouchTools();
 }
 
-wire(); boot();
+wire(); switchSide('front'); boot();
 })();
 </script>
 </body>
