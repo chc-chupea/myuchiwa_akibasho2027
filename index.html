@@ -292,6 +292,37 @@ body.has-photo .workflow .front-photo-controls{display:block}
 }
 
 body.has-photo #frontStep #photoStart{display:none!important}
+/* 2026-10-29: 元の茶・金の色調を維持し、写真補正と両面モニターをコンパクトに */
+.workflow-nav{display:none!important}
+.workflow .correction-box{padding:10px 11px;margin:0 0 7px}
+.workflow .correction-box .ctrlrow{margin-bottom:9px}
+.correction-sliders{display:grid;gap:8px}
+.correction-slider{display:grid;grid-template-columns:76px minmax(0,1fr) 43px;gap:8px;align-items:center;font-size:13px;font-weight:800;color:#54463b;cursor:default}
+.correction-slider input[type=range]{width:100%;min-width:0;accent-color:var(--brown);height:24px;cursor:pointer}
+.correction-slider output{font-size:12px;color:#786652;text-align:right;font-variant-numeric:tabular-nums}
+.correction-message{font-size:12px;color:#376149;font-weight:750;line-height:1.45;margin-top:5px}
+.correction-message:empty{display:none}
+.finish-monitor{margin:11px 0 0;padding:12px;border-radius:16px;border:1px solid #dcc9ac;background:#fffdf8}
+.finish-monitor-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+.finish-monitor-heading h2{font-size:19px;color:var(--brown);margin:0}
+.finish-monitor-heading p{margin:0;color:var(--muted);font-size:12px}
+.finish-monitor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.finish-monitor-side{border:1px solid #e4dccc;background:#fff;border-radius:11px;padding:7px;min-width:0}
+.finish-monitor-label{font-size:13px;font-weight:900;text-align:center;border-radius:8px;padding:4px 3px;margin-bottom:5px;white-space:nowrap}
+.front-label{color:#226679;background:#eaf5f7}.back-label{color:#9b3a69;background:#fff0f5}
+.finish-monitor-side img{display:block;width:100%;aspect-ratio:1024/725;object-fit:contain;background:#fff;border-radius:6px}
+.finish-monitor-state{font-size:11px;color:var(--muted);text-align:center;margin-top:5px}
+.finish-monitor-state.is-done{color:#26754c;font-weight:800}
+.finish-monitor-note{font-size:11px;line-height:1.4;color:#776b60;margin:7px 2px 0}
+.transfer-meter{background:#fff8ea;border:1px solid #ebd7af;border-radius:12px;padding:12px;margin:12px 0 0;color:#63421f}
+.transfer-row,.transfer-speed-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px}
+#transferPercent{font-size:19px;font-variant-numeric:tabular-nums}
+.transfer-track,.transfer-speed-track{width:100%;border-radius:99px;overflow:hidden;background:#e9decb}
+.transfer-track{height:12px;margin:7px 0 11px}.transfer-fill{height:100%;width:0;background:#a96b22;transition:width .18s}
+.transfer-speed-track{height:6px;margin:7px 0 0}.transfer-speed-fill{height:100%;width:0;background:#4d8ba6;transition:width .2s}
+#transferSpeed{font-size:15px;font-variant-numeric:tabular-nums}
+.transfer-note{font-size:11px;margin:7px 0 0;color:#77685b}
+@media(max-width:440px){.workflow .correction-box{padding:9px}.correction-slider{grid-template-columns:65px minmax(0,1fr) 42px;gap:6px}.finish-monitor{padding:9px}.finish-monitor-grid{gap:6px}.finish-monitor-side{padding:5px}.finish-monitor-label{font-size:12px}}
 </style>
 </head>
 <body>
@@ -307,7 +338,7 @@ body.has-photo #frontStep #photoStart{display:none!important}
   <input class="visually-hidden-file" id="cameraInput" type="file" accept="image/*" capture="environment" aria-label="カメラで写真を撮影">
   <input class="visually-hidden-file" id="photoInput" type="file" accept="image/*" aria-label="ライブラリの写真を選択">
 
-  <nav class="workflow-nav" aria-label="両面うちわの制作手順">
+  <nav class="workflow-nav" aria-label="両面うちわの制作手順" hidden>
     <p class="workflow-caption">表は写真、裏は推し活。<b>2つの面を作って完成！</b></p>
     <div class="workflow-tabs">
       <button type="button" id="miniFront" class="workflow-tab is-front active" aria-pressed="true">
@@ -335,8 +366,15 @@ body.has-photo #frontStep #photoStart{display:none!important}
       <section class="panel edit-panel" aria-label="表面の写真の調整">
         <div class="edit-body" id="frontEditor" >
           <div class="front-photo-controls">
-            <div class="ctrlbox"><div class="eyeline">✨ 写真をきれいにする <span class="optional-note">（お好みで）</span></div>
-              <div class="ctrlrow"><button type="button" class="btn primary" id="autoAdjust">おまかせ補正</button><button type="button" class="btn" id="adjustReset">補正を戻す</button></div>
+            <div class="ctrlbox correction-box" aria-label="写真補正">
+              <div class="eyeline">写真補正 <span class="optional-note">（お好みで）</span></div>
+              <div class="ctrlrow"><button type="button" class="btn primary" id="autoAdjust">✨ おまかせ補正</button><button type="button" class="btn" id="adjustReset">↶ もとに戻す</button></div>
+              <div class="correction-sliders">
+                <label class="correction-slider" for="brightnessRange"><span>明るさ</span><input id="brightnessRange" type="range" min="50" max="170" value="100" step="1"><output id="brightnessValue" for="brightnessRange">100%</output></label>
+                <label class="correction-slider" for="contrastRange"><span>くっきり</span><input id="contrastRange" type="range" min="50" max="190" value="100" step="1"><output id="contrastValue" for="contrastRange">100%</output></label>
+                <label class="correction-slider" for="saturationRange"><span>色あざやか</span><input id="saturationRange" type="range" min="30" max="220" value="100" step="1"><output id="saturationValue" for="saturationRange">100%</output></label>
+              </div>
+              <div class="correction-message" id="correctionMessage" role="status" aria-live="polite"></div>
             </div>
             <div class="reselect-area" id="reselectGroup">
               <div class="eyeline">写真をえらび直す</div>
@@ -384,6 +422,14 @@ body.has-photo #frontStep #photoStart{display:none!important}
       <span id="editorTitle"></span><span id="editorDesc"></span>
     </div>
 
+    <section class="panel finish-monitor" id="finishMonitor" hidden aria-label="表と裏の完成イメージ">
+      <div class="finish-monitor-heading"><h2>仕上がり確認</h2><p>表と裏のうちわを並べて確認できます。</p></div>
+      <div class="finish-monitor-grid">
+        <div class="finish-monitor-side"><div class="finish-monitor-label front-label">① 表｜記念写真</div><img id="monitorFront" alt="表面の印刷仕上がりプレビュー"><div class="finish-monitor-state" id="monitorFrontState">写真を選んでください</div></div>
+        <div class="finish-monitor-side"><div class="finish-monitor-label back-label">② 裏｜推し活</div><img id="monitorBack" alt="裏面の印刷仕上がりプレビュー"><div class="finish-monitor-state" id="monitorBackState">スタンプを選んでください</div></div>
+      </div>
+      <p class="finish-monitor-note">※印刷時には表裏の右下に同じ受付番号が付きます。</p>
+    </section>
     <section class="panel order-panel" id="orderPanel">
         <div class="section-head"><h2>③ 注文する</h2><p>表は記念写真、裏は推し活スタンプ。仕上がりを確認したら注文へ。</p></div>
         <div class="edit-body">
@@ -396,6 +442,13 @@ body.has-photo #frontStep #photoStart{display:none!important}
           <label class="agree"><input type="checkbox" id="consent"> <span>写真をうちわの制作・注文受付に使うことに同意します。</span></label>
           <button type="button" class="submit" id="orderBtn">注文を確定する</button>
           <p id="orderStatus" class="status" role="status" aria-live="polite"></p>
+          <section class="transfer-meter" id="transferMeter" hidden aria-label="画像の送信状況" role="status" aria-live="off">
+            <div class="transfer-row"><strong id="transferPhase">画像データを送信中</strong><strong id="transferPercent">0%</strong></div>
+            <div class="transfer-track" id="transferProgress" role="progressbar" aria-label="表裏画像の転送進捗" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="transferFill" class="transfer-fill"></div></div>
+            <div class="transfer-speed-row"><span>通信速度（実測）</span><strong id="transferSpeed">計測中…</strong></div>
+            <div class="transfer-speed-track" aria-hidden="true"><div id="transferSpeedFill" class="transfer-speed-fill"></div></div>
+            <p class="transfer-note" id="transferNote">完了までこの画面を閉じないでください。</p>
+          </section>
           <div id="pendingRecovery" class="pending-recovery" role="group" aria-label="未確定の注文を確認">
             <p id="pendingRecoveryText"></p>
             <button type="button" class="btn" id="checkPendingBtn">受付状況を確認する</button>
@@ -444,6 +497,8 @@ const HEADER_LOGO_KEY='headerLogo', FRONT_MASK_KEY='frontMask', FRONT_BASE_KEY='
 const el=id=>document.getElementById(id), stage=el('stage'), sc=stage.getContext('2d');
 const pics={}; let photoImage=null, side='front', stampId=1, selected=null, stamps=[];
 let photo={x:512,y:330,scale:1,angle:0,bright:1,sat:1,contrast:1};
+// 補正した元画像のプレビュー用と印刷用を分離し、印刷品質を保持する。
+let correctedPreviewPhoto=null, correctedFullPhoto=null, correctionTimer=null;
 let backStack=[], frontStack=[], backRedo=[], frontRedo=[], pinches=new Map(), gesture=null, ready=false, lastOrderCode='';
  let sending=false, photoLoading=false, orderFinalized=false, lockedControls=[];
 const stampsMeta={}; STAMPS.forEach(([key,label])=>stampsMeta[key]=label);
@@ -473,7 +528,7 @@ async function boot(){
 
 function snapshot(){ return side==='front' ? {...photo} : {stamps:stamps.map(s=>({...s})), selected}; }
 function saveUndo(){ const stack=side==='front'?frontStack:backStack, redo=side==='front'?frontRedo:backRedo; stack.push(snapshot()); if(stack.length>30)stack.shift(); redo.length=0; updateUndo(); }
-function applyState(value){ if(side==='front'){ photo={...value}; } else { stamps=value.stamps.map(s=>({...s})); selected=value.selected; updateStampControls(); updateSideProgress(); } render(); updateThumbs(); updateTouchTools(); }
+function applyState(value){ if(side==='front'){ photo={...value}; syncCorrectionControls(); refreshCorrection(); } else { stamps=value.stamps.map(s=>({...s})); selected=value.selected; updateStampControls(); updateSideProgress(); render(); updateThumbs(); } updateTouchTools(); }
 function undo(){ const a=side==='front'?frontStack:backStack,b=side==='front'?frontRedo:backRedo; if(!a.length)return; b.push(snapshot()); applyState(a.pop()); updateUndo(); }
 function redo(){ const a=side==='front'?frontStack:backStack,b=side==='front'?frontRedo:backRedo; if(!b.length)return; a.push(snapshot()); applyState(b.pop()); updateUndo(); }
 function updateUndo(){ el('undoBtn').disabled=!(side==='front'?frontStack:backStack).length; el('redoBtn').disabled=!(side==='front'?frontRedo:backRedo).length; }
@@ -482,11 +537,69 @@ function drawPhoto(ctx){
   if(!photoImage){ ctx.fillStyle='#f7f7f7'; ctx.fillRect(0,0,CW,CH); return; }
   ctx.save();
   ctx.translate(photo.x,photo.y); ctx.rotate(photo.angle*Math.PI/180);
-  ctx.filter=`brightness(${photo.bright}) contrast(${photo.contrast}) saturate(${photo.sat})`;
+  const source=correctedFullPhoto || correctedPreviewPhoto || photoImage;
   const base=Math.max(980/photoImage.naturalWidth, 680/photoImage.naturalHeight);
   const w=photoImage.naturalWidth*base*photo.scale, h=photoImage.naturalHeight*base*photo.scale;
-  ctx.drawImage(photoImage,-w/2,-h/2,w,h);
+  ctx.drawImage(source,-w/2,-h/2,w,h);
   ctx.restore();
+}
+
+function correctionIsNeutral(){return photo.bright===1 && photo.contrast===1 && photo.sat===1;}
+function invalidateCorrection(clearPreview=false){correctedFullPhoto=null;if(clearPreview)correctedPreviewPhoto=null;}
+function syncCorrectionControls(){
+  for(const [key,id,outId] of [['bright','brightnessRange','brightnessValue'],['contrast','contrastRange','contrastValue'],['sat','saturationRange','saturationValue']]){
+    const pct=Math.round(photo[key]*100);el(id).value=String(pct);el(outId).textContent=pct+'%';
+  }
+}
+// 2027年カレンダー版と同様、RGB画素を実際に補正する。Safari等でCanvasのfilterに依存しない。
+function buildCorrectedPhoto(maxDimension=1200){
+  if(!photoImage || correctionIsNeutral())return null;
+  const sw=photoImage.naturalWidth,sh=photoImage.naturalHeight;
+  const ratio=Math.min(1,maxDimension/Math.max(sw,sh));
+  const c=document.createElement('canvas');c.width=Math.max(1,Math.round(sw*ratio));c.height=Math.max(1,Math.round(sh*ratio));
+  const cx=c.getContext('2d',{willReadFrequently:true});cx.drawImage(photoImage,0,0,c.width,c.height);
+  const pixels=cx.getImageData(0,0,c.width,c.height),data=pixels.data;
+  const bright=photo.bright,contrast=photo.contrast,sat=photo.sat;
+  for(let i=0;i<data.length;i+=4){
+    const r=data[i],g=data[i+1],b=data[i+2],gray=r*.2126+g*.7152+b*.0722;
+    data[i]=Math.round(clamp(((gray+(r-gray)*sat-128)*contrast+128)*bright,0,255));
+    data[i+1]=Math.round(clamp(((gray+(g-gray)*sat-128)*contrast+128)*bright,0,255));
+    data[i+2]=Math.round(clamp(((gray+(b-gray)*sat-128)*contrast+128)*bright,0,255));
+  }
+  cx.putImageData(pixels,0,0);return c;
+}
+function refreshCorrection(){
+  clearTimeout(correctionTimer);
+  invalidateCorrection(true);
+  if(!correctionIsNeutral() && photoImage){
+    try{correctedPreviewPhoto=buildCorrectedPhoto(1400);}catch(e){console.error('補正画像生成',e);el('correctionMessage').textContent='補正を適用できませんでした。別の写真をお試しください。';}
+  }
+  render();updateThumbs();
+}
+function scheduleCorrection(){
+  clearTimeout(correctionTimer);invalidateCorrection();
+  // スライダー操作中は応答性を優先し、短い間隔でプレビューを再生成する。
+  correctionTimer=setTimeout(refreshCorrection,65);
+}
+function ensurePrintCorrection(){
+  clearTimeout(correctionTimer);
+  if(correctionIsNeutral()){invalidateCorrection(true);return;}
+  if(!correctedFullPhoto)correctedFullPhoto=buildCorrectedPhoto(3508);
+}
+function autoCorrectPhoto(){
+  if(!photoImage)return;
+  const sw=photoImage.naturalWidth,sh=photoImage.naturalHeight,ratio=Math.min(1,500/Math.max(sw,sh));
+  const sample=document.createElement('canvas');sample.width=Math.max(1,Math.round(sw*ratio));sample.height=Math.max(1,Math.round(sh*ratio));
+  const cx=sample.getContext('2d',{willReadFrequently:true});cx.drawImage(photoImage,0,0,sample.width,sample.height);
+  const d=cx.getImageData(0,0,sample.width,sample.height).data;
+  let sum=0,sumSq=0,chroma=0,count=0;
+  for(let i=0;i<d.length;i+=16){const r=d[i],g=d[i+1],b=d[i+2],lum=r*.2126+g*.7152+b*.0722;sum+=lum;sumSq+=lum*lum;chroma+=Math.max(r,g,b)-Math.min(r,g,b);count++;}
+  const mean=sum/count,std=Math.sqrt(Math.max(0,sumSq/count-mean*mean)),color=chroma/count;
+  const brightness=mean<135?clamp(Math.round(100+(135-mean)*.65),100,150):mean>185?clamp(Math.round(100-(mean-185)*.35),80,100):100;
+  const contrast=std<58?clamp(Math.round(100+(58-std)*1.35),100,165):std>82?clamp(Math.round(100-(std-82)*.45),82,100):100;
+  const saturation=color<42?155:color<70?138:122;
+  saveUndo();photo.bright=brightness/100;photo.contrast=contrast/100;photo.sat=saturation/100;
+  syncCorrectionControls();el('correctionMessage').textContent='写真に合わせて補正しました。スライダーで調整できます。';refreshCorrection();
 }
 
 function computeStampBox(img){
@@ -577,8 +690,12 @@ function drawBackComposition(ctx,outW,outH){
 function drawComposition(ctx,which,outW,outH,previewOnly=false){ if(which==='front') drawFrontComposition(ctx,outW,outH,previewOnly); else drawBackComposition(ctx,outW,outH); }
 function drawReceiptBand(ctx,outW,outH,displayCode){ if(!displayCode)return; ctx.save(); const scale=Math.min(outW/PRINT_W,outH/PRINT_H); const padX=32*scale,padY=16*scale; const font=Math.max(40*scale,15); ctx.font=`700 ${font}px system-ui,-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif`; const textW=ctx.measureText(displayCode).width; const bandH=font+padY*2, bandW=textW+padX*2; const x=Math.min(outW*0.66,outW*0.80-bandW), y=outH*0.80; ctx.fillStyle='rgba(255,255,255,0.90)'; ctx.fillRect(x,y,bandW,bandH); ctx.fillStyle='rgba(70,70,70,0.95)'; ctx.textBaseline='middle'; ctx.fillText(displayCode,x+padX,y+bandH/2); ctx.restore(); }
 function render(){ if(!ready)return; drawComposition(sc,side,CW,CH,true); }
-function makePrintCanvas(which,displayCode=''){ const c=document.createElement('canvas'); c.width=PRINT_W; c.height=PRINT_H; const cx=c.getContext('2d'); drawComposition(cx,which,PRINT_W,PRINT_H); drawReceiptBand(cx,PRINT_W,PRINT_H,displayCode); return c; }
-function updateThumbs(){ if(!ready)return; for(const which of ['front','back']){ const c=document.createElement('canvas'); c.width=440; c.height=311; drawComposition(c.getContext('2d'),which,c.width,c.height); el(which+'Thumb').src=c.toDataURL('image/jpeg',0.78); } }
+function makePrintCanvas(which,displayCode=''){ if(which==='front')ensurePrintCorrection(); const c=document.createElement('canvas'); c.width=PRINT_W; c.height=PRINT_H; const cx=c.getContext('2d'); drawComposition(cx,which,PRINT_W,PRINT_H); drawReceiptBand(cx,PRINT_W,PRINT_H,displayCode); return c; }
+function updateThumbs(){ if(!ready)return; for(const which of ['front','back']){ const c=document.createElement('canvas'); c.width=440; c.height=311; drawComposition(c.getContext('2d'),which,c.width,c.height); const src=c.toDataURL('image/jpeg',0.82); el(which+'Thumb').src=src;el(which==='front'?'monitorFront':'monitorBack').src=src; }
+  for(const [sideName,done] of [['Front',!!photoImage],['Back',!!currentStamp()]]){
+    const e=el('monitor'+sideName+'State');e.textContent=done?'✓ 準備できました':sideName==='Front'?'写真を選んでください':'スタンプを選んでください';e.classList.toggle('is-done',done);
+  }
+}
 
 function updateSideProgress(){
   const states=[['front',!!photoImage,'写真OK','写真を選ぶ'],['back',!!currentStamp(),'スタンプOK','スタンプを選ぶ']];
@@ -596,6 +713,7 @@ function switchSide(which){
   el('frontStep').hidden=!isFront;
   el('backStep').hidden=isFront;
   el('orderPanel').hidden=isFront;
+  el('finishMonitor').hidden=isFront;
   el(isFront?'frontPreviewSlot':'backPreviewSlot').appendChild(el('previewPanel'));
   for(const name of ['Front','Back']){
     const active=which===name.toLowerCase(), button=el('mini'+name);
@@ -669,6 +787,7 @@ async function onPhotoSelected(e){
   try{
     const img=await loadImage(objectURL); photoImage=img;
     photo={x:512,y:330,scale:1,angle:0,bright:1,sat:1,contrast:1};
+    invalidateCorrection(true);syncCorrectionControls();el('correctionMessage').textContent='';
     frontStack=[]; frontRedo=[]; switchSide('front'); updateUndo(); updateTouchTools();
     el('stageHelp').textContent='写真が入りました。指で動かせます。';
     el('photoStart').classList.add('is-ready');
@@ -726,7 +845,7 @@ function showRecovery(){
 function setSending(value){
   sending=value;
   if(value){
-    lockedControls=[...document.querySelectorAll('#photoStart button,#backStart button,#frontEditor button,#backEditor button,.mini,#action-footer button,.action-footer button,#copies,#customerName,#consent')].map(e=>[e,e.disabled]);
+    lockedControls=[...document.querySelectorAll('#photoStart button,#backStart button,#frontEditor button,#backEditor button,#brightnessRange,#contrastRange,#saturationRange,.mini,#action-footer button,.action-footer button,#copies,#customerName,#consent')].map(e=>[e,e.disabled]);
     lockedControls.forEach(([e])=>{e.disabled=true;});
   }else{
     lockedControls.forEach(([e,wasDisabled])=>{e.disabled=wasDisabled;});lockedControls=[];
@@ -738,6 +857,7 @@ function setSending(value){
   el('clearPendingBtn').disabled=value;
 }
 async function fingerprint(){
+  if(photoImage && !correctionIsNeutral() && !correctedPreviewPhoto)refreshCorrection();
   const tiny=(which)=>{const c=document.createElement('canvas');c.width=320;c.height=227;drawComposition(c.getContext('2d'),which,c.width,c.height);return c.toDataURL('image/png');};
   const data=JSON.stringify([tiny('front'),tiny('back'),el('customerName').value.trim(),Number(el('copies').value)]);
   if(crypto?.subtle){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(data));return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -777,6 +897,36 @@ async function checkPending(){
   }catch(e){status(e.message||'受付状況を確認できませんでした。','error');}
   finally{b.disabled=false;}
 }
+// 二つの画像を合算し、Firebase Storageから報告される転送バイト数で進捗・通信速度を算出。
+// 回線の公称速度ではなく、この注文の実際のアップロード実効速度を表示する。
+let transferState=null;
+function resetTransfer(total){transferState={total,front:0,back:0,lastBytes:0,lastTime:performance.now(),speed:0};el('transferMeter').hidden=false;updateTransferMeter('送信の準備中…',0);}
+function updateTransferMeter(phase,speedOverride){
+  const s=transferState;if(!s)return;
+  const bytes=s.front+s.back,pct=s.total?Math.min(100,Math.floor(bytes/s.total*100)):0;
+  el('transferPhase').textContent=phase;el('transferPercent').textContent=pct+'%';el('transferFill').style.width=pct+'%';
+  el('transferProgress').setAttribute('aria-valuenow',String(pct));
+  const mbps=speedOverride??s.speed;el('transferSpeed').textContent=mbps>0?mbps.toFixed(2)+' MB/秒':'計測中…';
+  el('transferSpeedFill').style.width=(Math.min(mbps/10,1)*100).toFixed(1)+'%';
+  el('transferNote').textContent='速度バーは10 MB/秒を上限として表示（実測速度：'+(mbps>0?mbps.toFixed(2)+' MB/秒':'計測中')+'）。';
+}
+function updateTransferBytes(which,bytes,phase){
+  const s=transferState;if(!s)return;
+  s[which]=bytes;const now=performance.now(),total=s.front+s.back,dt=now-s.lastTime,delta=total-s.lastBytes;
+  if(dt>90&&delta>0){const instantaneous=delta/(dt/1000)/(1024*1024);s.speed=s.speed?instantaneous*.55+s.speed*.45:instantaneous;s.lastBytes=total;s.lastTime=now;}
+  updateTransferMeter(phase);
+}
+function hideTransferMeter(){el('transferMeter').hidden=true;transferState=null;}
+function uploadWithMeter(st,storage,path,blob,which,phase){
+  return new Promise((resolve,reject)=>{
+    const task=st.uploadBytesResumable(st.ref(storage,path),blob,{contentType:'image/png'});
+    let completed=false;
+    const timer=setTimeout(()=>{if(completed)return;completed=true;task.cancel();reject(new Error(phase+'が時間切れです。通信状況を確認してください。'));},90000);
+    const done=(fn,value)=>{if(completed)return;completed=true;clearTimeout(timer);fn(value);};
+    task.on('state_changed',snap=>updateTransferBytes(which,snap.bytesTransferred,phase),err=>done(reject,err),()=>{updateTransferBytes(which,blob.size,phase);done(resolve);});
+  });
+}
+
 async function sendOrder(){
   if(sending||orderFinalized)return;
   if(!ready){ status('画像の準備が終わっていません。','error'); return; }
@@ -784,7 +934,7 @@ async function sendOrder(){
   if(!photoImage){ switchSide('front'); status('① まず表面の記念写真を選んでください。','error'); el('libraryStart').focus(); return; }
   if(!currentStamp()){ switchSide('back'); status('② 裏面のスタンプを１つ選んでください。','error'); el('stageHelp').textContent='スタンプを１つ選んでください。'; return; }
   if(!el('consent').checked){ status('写真の利用について同意欄にチェックしてください。','error'); return; }
-  setSending(true);const btn=el('orderBtn');btn.textContent='注文データを送信中…';el('complete').style.display='none';
+  setSending(true);hideTransferMeter();const btn=el('orderBtn');btn.textContent='注文データを送信中…';el('complete').style.display='none';
   try{
     const signature=await fingerprint();
     const {db,storage,fs,st,uid}=await getFirebase();
@@ -807,15 +957,21 @@ async function sendOrder(){
     status('両面の印刷データを作成しています…');
     const fcan=makePrintCanvas('front',p.displayCode),fblob=await toPngBlob(fcan);fcan.width=0;fcan.height=0;
     const bcan=makePrintCanvas('back',p.displayCode),bblob=await toPngBlob(bcan);bcan.width=0;bcan.height=0;
+    // 高解像度補正キャンバスは送信データ生成後に解放。画面用補正プレビューは残す。
+    correctedFullPhoto=null;
     const folder=`orders/${shopId}/${uid}/${p.date}`,frontPath=`${folder}/${p.queueId}.png`,backPath=`${folder}/${p.queueId}_back.png`;
-    status('表面の写真を送信しています…');const fr=st.ref(storage,frontPath);await timeout(st.uploadBytes(fr,fblob,{contentType:'image/png'}),90000,'表面の送信');const imageUrl=await timeout(st.getDownloadURL(fr),15000,'表面URL取得');
-    status('裏面のスタンプを送信しています…');const br=st.ref(storage,backPath);await timeout(st.uploadBytes(br,bblob,{contentType:'image/png'}),90000,'裏面の送信');const backImageUrl=await timeout(st.getDownloadURL(br),15000,'裏面URL取得');
+    resetTransfer(fblob.size+bblob.size);
+    status('表面の写真を送信しています…');const fr=st.ref(storage,frontPath);await uploadWithMeter(st,storage,frontPath,fblob,'front','表面の写真を送信しています…');const imageUrl=await timeout(st.getDownloadURL(fr),15000,'表面URL取得');
+    status('裏面のスタンプを送信しています…');const br=st.ref(storage,backPath);await uploadWithMeter(st,storage,backPath,bblob,'back','裏面のスタンプを送信しています…');const backImageUrl=await timeout(st.getDownloadURL(br),15000,'裏面URL取得');
+    updateTransferMeter('画像の転送が完了しました。注文を確定しています…');
     status('注文を確定しています…');const orderRef=fs.doc(db,'orders',p.queueId);
     const orderData={ownerUid:uid,source:'aki-basho-double-fan',productType:'double-sided-fan',doubleSided:true,queueId:p.queueId,shortId:p.shortId,displayNo:p.serial,displayCode:p.displayCode,shopId,shopName:'大相撲安芸場所巡業',shopCode:'AK',dayKey:p.date,customerName:el('customerName').value.trim(),copies:Number(el('copies').value),imageUrl,frontImageUrl:imageUrl,backImageUrl,storagePath:frontPath,backStoragePath:backPath,template:'aki-front',backTemplate:'aki-back',stampCount:1,priceType:'event',unitPrice:null,totalPrice:null,status:'WAIT',retentionPolicy:'pickup-plus-24h',createdAt:fs.serverTimestamp(),updatedAt:fs.serverTimestamp()};
     await timeout(fs.setDoc(orderRef,orderData),30000,'注文確定');
     finishOrder(p);
+    hideTransferMeter();
   }catch(e){
     console.error(e);const explanation=e.code==='permission-denied'?'Firebaseのセキュリティルールにより拒否されました。FirestoreとStorageのルールを確認してください。':e.code==='auth/operation-not-allowed'?'Firebase Authenticationで「匿名」ログインを有効にしてください。':e.message||'通信エラーが発生しました。';
+    hideTransferMeter();
     status('注文の完了を確認できませんでした。\n'+explanation+'\n'+(pendingOrder?'受付番号 '+pendingOrder.displayCode+' を管理画面で確認してください。確認せずに新規注文を作らないでください。':'再試行してください。'),'error');
   }finally{
     setSending(false);btn.textContent=orderFinalized?'注文確定済み':pendingOrder?'注文を再確認・送信する':'注文を確定する';
@@ -840,8 +996,16 @@ function wire(){
   el('cameraInput').addEventListener('change', onPhotoSelected);
   el('photoInput').addEventListener('change', onPhotoSelected);
   el('smallerBtn').onclick=()=>changeSize(0.86); el('biggerBtn').onclick=()=>changeSize(1.16); el('rotateBtn').onclick=rotateTarget; el('resetThingBtn').onclick=resetTarget;
-  el('autoAdjust').onclick=()=>{ if(!photoImage)return; saveUndo(); photo.bright=1.10; photo.sat=1.16; photo.contrast=1.08; render(); updateThumbs(); };
-  el('adjustReset').onclick=()=>{ if(!photoImage)return; saveUndo(); photo.bright=photo.sat=photo.contrast=1; render(); updateThumbs(); };
+  el('autoAdjust').onclick=autoCorrectPhoto;
+  el('adjustReset').onclick=()=>{if(!photoImage)return;saveUndo();photo.bright=photo.sat=photo.contrast=1;syncCorrectionControls();el('correctionMessage').textContent='元の色に戻しました。';refreshCorrection();};
+  for(const [key,id,outId] of [['bright','brightnessRange','brightnessValue'],['contrast','contrastRange','contrastValue'],['sat','saturationRange','saturationValue']]){
+    const range=el(id);
+    range.addEventListener('pointerdown',()=>{if(photoImage)saveUndo();});
+    range.addEventListener('keydown',e=>{if(photoImage&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','PageUp','PageDown'].includes(e.key))saveUndo();});
+    range.addEventListener('input',()=>{if(!photoImage)return;photo[key]=Number(range.value)/100;el(outId).textContent=range.value+'%';el('correctionMessage').textContent='';scheduleCorrection();});
+    range.addEventListener('change',()=>{if(photoImage)refreshCorrection();});
+  }
+  syncCorrectionControls();
   const makeStampButton=(key,label)=>{ const b=document.createElement('button'); b.className='stamp-btn'; b.type='button'; b.dataset.stampKey=key; b.title=label; b.setAttribute('aria-label', label+'を選ぶ'); const im=document.createElement('img'); im.src=resolveAsset(key); im.alt=''; const tag=document.createElement('span'); tag.textContent=label; b.append(im,tag); b.onclick=()=>addStamp(key); return b; };
   for(const [key,label] of STAMPS){ el('stampGrid').append(makeStampButton(key,label)); el(featured.includes(key)?'quickStampGrid':'moreStampGrid').append(makeStampButton(key,label)); }
   stage.addEventListener('pointerdown',onPointerDown); stage.addEventListener('pointermove',onPointerMove); stage.addEventListener('pointerup',onPointerUp); stage.addEventListener('pointercancel',onPointerUp); stage.addEventListener('lostpointercapture',onPointerUp);
