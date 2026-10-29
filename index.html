@@ -514,7 +514,12 @@ async function readExistingOrder(db,fs,p){
   // 顧客用Firebaseルールで注文の読み取りが禁じられている場合は、受付管理画面での確認に切り替える。
   let snap;
   try{snap=await timeout(fs.getDocFromServer(fs.doc(db,'orders',p.queueId)),15000,'注文状態の確認');}
-  catch(e){throw new Error('受付状況を自動確認できません。スタッフが受付管理画面で '+p.displayCode+' を確認してください。'+(e.code==='permission-denied'?'（お客様側の閲覧権限は不要です）':''));}
+  catch(e){
+    // 未作成の注文は、resource.data に基づく閲覧条件を満たせず permission-denied になる場合がある。
+    // 「未登録」と断言せず、同じ受付番号での再送のみ許す。既存注文の上書きはFirestoreルールが阻止する。
+    if(e.code==='permission-denied')return 'unverified';
+    throw new Error('受付状況を自動確認できません。スタッフが受付管理画面で '+p.displayCode+' を確認してください。');
+  }
   if(!snap.exists())return 'missing';
   const o=snap.data();
   if(o.shopId!==shopId||o.source!=='aki-basho-double-fan'||o.displayCode!==p.displayCode)throw new Error('受付番号の照合が一致しません。スタッフにご連絡ください。');
@@ -533,7 +538,8 @@ async function checkPending(){
   const b=el('checkPendingBtn');b.disabled=true;status('受付状況を確認しています…');
   try{const {db,fs}=await getFirebase();const result=await readExistingOrder(db,fs,pendingOrder);
     if(result==='complete')finishOrder(pendingOrder);
-    else status('この受付番号の注文登録は見つかりません。同じ写真・スタンプ・本数なら「注文を確定する」で再試行できます。別の内容で注文する場合は、スタッフに確認してください。','error');
+    else if(result==='missing')status('この受付番号の注文登録は見つかりません。同じ写真・スタンプ・本数なら「注文を確定する」で再試行できます。別の内容で注文する場合は、スタッフに確認してください。','error');
+    else status('未登録かどうかを権限上確認できません。管理画面で受付番号 '+pendingOrder.displayCode+' を確認してください。再試行する場合は同じ写真・スタンプ・本数・お名前のまま「注文を確定する」を押してください。','error');
   }catch(e){status(e.message||'受付状況を確認できませんでした。','error');}
   finally{b.disabled=false;}
 }
@@ -552,6 +558,8 @@ async function sendOrder(){
     if(p){
       const existing=await readExistingOrder(db,fs,p);
       if(existing==='complete'){finishOrder(p);return;}
+      // get が権限で拒否されても、同じ受付番号の再利用は可能。
+      // 既に注文が作成されていた場合、Firestoreの create-only ルールが重複登録を止める。
       if(p.signature!==signature)throw new Error('以前の未確定注文と写真・スタンプ・本数・お名前が異なります。再送せず、スタッフに受付番号 '+p.displayCode+' を確認してください。');
       status('前回の受付番号 '+p.displayCode+' で送信を再開します…');
     }else{
@@ -565,7 +573,7 @@ async function sendOrder(){
     status('両面の印刷データを作成しています…');
     const fcan=makePrintCanvas('front',p.displayCode),fblob=await toPngBlob(fcan);fcan.width=0;fcan.height=0;
     const bcan=makePrintCanvas('back',p.displayCode),bblob=await toPngBlob(bcan);bcan.width=0;bcan.height=0;
-    const folder=`orders/${shopId}/${p.date}`,frontPath=`${folder}/${p.queueId}.png`,backPath=`${folder}/${p.queueId}_back.png`;
+    const folder=`orders/${shopId}/${uid}/${p.date}`,frontPath=`${folder}/${p.queueId}.png`,backPath=`${folder}/${p.queueId}_back.png`;
     status('表面の写真を送信しています…');const fr=st.ref(storage,frontPath);await timeout(st.uploadBytes(fr,fblob,{contentType:'image/png'}),90000,'表面の送信');const imageUrl=await timeout(st.getDownloadURL(fr),15000,'表面URL取得');
     status('裏面のスタンプを送信しています…');const br=st.ref(storage,backPath);await timeout(st.uploadBytes(br,bblob,{contentType:'image/png'}),90000,'裏面の送信');const backImageUrl=await timeout(st.getDownloadURL(br),15000,'裏面URL取得');
     status('注文を確定しています…');const orderRef=fs.doc(db,'orders',p.queueId);
