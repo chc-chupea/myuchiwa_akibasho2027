@@ -128,17 +128,8 @@ body[data-side="back"] .stage-wrap canvas{cursor:default}
   #touchTools{display:none!important}
 }
 
-/* 表面の編集プレビューだけ、元画像の半透明の外側を見えるようにする。 */
-#stage {
-  background-color:#b5c0ca;
-  background-image:
-    linear-gradient(45deg,#d7dfe6 25%,transparent 25%,transparent 75%,#d7dfe6 75%),
-    linear-gradient(45deg,#d7dfe6 25%,transparent 25%,transparent 75%,#d7dfe6 75%);
-  background-size:26px 26px;
-  background-position:0 0,13px 13px;
-}
-/* 裏面の編集表示は従来どおり白地。 */
-body[data-side="back"] #stage { background:#fff; }
+/* 編集時は写真全体が見える白背景。半透明は元の fan1-highres.png で表現する。 */
+#stage { background:#fff; }
 </style>
 </head>
 <body>
@@ -347,35 +338,45 @@ function getLayer(outW,outH){
   return layerCache.get(key);
 }
 
+// 白背景の写真でも分かる、ごく細い編集専用の境界ガイド。
+// 太い fan-outline.png は使用しない。印刷画像には含めない。
+let previewFineEdge=null;
+function getPreviewFineEdge(){
+  if(previewFineEdge) return previewFineEdge;
+  const c=document.createElement('canvas'); c.width=CW; c.height=CH;
+  const ec=c.getContext('2d');
+  // マスクの外周を約2pxだけふくらませ、元の内側を抜く。
+  for(const [dx,dy] of [[-2,0],[2,0],[0,-2],[0,2],[-1,-1],[1,1],[-1,1],[1,-1]]){
+    ec.drawImage(pics[FRONT_MASK_KEY],dx,dy,CW,CH);
+  }
+  ec.globalCompositeOperation='destination-out';
+  ec.drawImage(pics[FRONT_MASK_KEY],0,0,CW,CH);
+  ec.globalCompositeOperation='source-in';
+  ec.fillStyle='rgba(118,88,118,0.60)';
+  ec.fillRect(0,0,CW,CH);
+  ec.globalCompositeOperation='source-over';
+  previewFineEdge=c;
+  return c;
+}
+
 function drawFrontComposition(ctx,outW,outH,previewOnly=false){
   ctx.save();
   if(previewOnly){
-    ctx.clearRect(0,0,outW,outH);
-    const photoLayer=getLayer(outW,outH), pctx=photoLayer.getContext('2d');
-    pctx.setTransform(1,0,0,1,0,0); pctx.clearRect(0,0,outW,outH); pctx.setTransform(outW/CW,0,0,outH/CH,0,0);
-    drawPhoto(pctx);
-    ctx.drawImage(photoLayer,0,0);
-
-    const guide=document.createElement('canvas'); guide.width=outW; guide.height=outH;
-    const g=guide.getContext('2d');
-    g.fillStyle='rgba(160,160,160,0.26)';
-    g.fillRect(0,0,outW,outH);
-    g.globalCompositeOperation='destination-out';
-    g.drawImage(pics[FRONT_MASK_KEY],0,0,outW,outH);
-    g.globalCompositeOperation='source-atop';
-    const step=Math.max(18,Math.round(outW/34));
-    for(let y=0;y<outH;y+=step){
-      for(let x=0;x<outW;x+=step){
-        g.fillStyle=((x/step+y/step)%2===0)?'rgba(255,255,255,0.10)':'rgba(110,110,110,0.07)';
-        g.fillRect(x,y,step,step);
-      }
-    }
-    ctx.drawImage(guide,0,0);
-    // プレビューでは写真全体を見せたまま、うちわ外側だけにガイドを重ねる。
-    // fan1-highres.png は印刷用の見た目に使用し、プレビューでは写真を消さないため重ねない。
+    // 編集画面：写真をマスクで消さず、うちわの外に出る部分も全て描画。
+    ctx.fillStyle='#fff'; ctx.fillRect(0,0,outW,outH);
+    const layer=getLayer(outW,outH), l=layer.getContext('2d');
+    l.setTransform(1,0,0,1,0,0); l.clearRect(0,0,outW,outH);
+    l.setTransform(outW/CW,0,0,outH/CH,0,0);
+    drawPhoto(l);
+    ctx.drawImage(layer,0,0);
+    // 元の素材が持つ半透明の外側（白・α148/255）をそのまま重ねる。
+    // 外側の写真は消えず、約42％の濃さで見える。内側と下部ロゴは元のまま。
+    ctx.drawImage(pics[FRONT_BASE_KEY],0,0,outW,outH);
+    ctx.drawImage(getPreviewFineEdge(),0,0,outW,outH);
     ctx.restore();
     return;
   }
+  // 印刷と仕上がりサムネイル：これまでの処理を変更しない。
   ctx.fillStyle='#fff'; ctx.fillRect(0,0,outW,outH);
   const layer=getLayer(outW,outH), l=layer.getContext('2d');
   l.setTransform(1,0,0,1,0,0); l.clearRect(0,0,outW,outH); l.setTransform(outW/CW,0,0,outH/CH,0,0);
