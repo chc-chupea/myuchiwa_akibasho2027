@@ -145,13 +145,17 @@ function printOrder(o,sides){
   w.document.open();
   w.document.write(`<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title>${esc(o.displayCode||o.id)} - 表裏印刷</title>
 <style>
-  @page{size:A4 landscape;margin:0.5mm}
+  /* A4そのものをページサイズとし、ブラウザー側の印刷余白を排除する。 */
+  @page{size:A4 landscape;margin:0}
   *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:#fff}
-  /* 1ページ内で完結する固定サイズ。元のimgをCSSで105.3%拡大しない。 */
-  .page{width:296mm;height:209mm;overflow:hidden;display:flex;align-items:center;justify-content:center;break-inside:avoid;page-break-inside:avoid;page-break-after:always;break-after:page}
-  .page:last-of-type{page-break-after:auto;break-after:auto}
-  .sheet-art{display:block;width:295.65mm;height:209mm;max-width:none;flex:none}
+  html,body{width:297mm;margin:0;padding:0;background:#fff}
+  /* ページ末尾に余裕を残す。画像は絶対配置で原寸を維持するため、
+     改ページ位置の丸め誤差による空白ページを発生させない。 */
+  .page{position:relative;width:297mm;height:208mm;margin:0;padding:0;border:0;overflow:visible;break-inside:avoid;page-break-inside:avoid}
+  /* 2ページ目以降の「開始時」だけ明示的に改ページする。最終ページの後ろには何も追加しない。 */
+  .page + .page{break-before:page;page-break-before:always}
+  /* 以前と同じ絶対位置・印刷サイズ（左0.675mm、上0.5mm、幅295.65mm、高さ209mm）。 */
+  .sheet-art{position:absolute;left:0.675mm;top:0.5mm;display:block;width:295.65mm;height:209mm;max-width:none}
   #printError{display:none;color:#a22;font-size:16px;font-weight:bold;padding:12px}
   @media screen{body{background:#ddd;padding:10px 0}.page{background:white;margin:8mm auto;box-shadow:0 0 8px #aaa}#printError{background:white;max-width:297mm;margin:auto}}
 </style></head><body><p id="printError" role="alert"></p>${sheet}</body></html>`);
