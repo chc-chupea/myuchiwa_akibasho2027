@@ -38,10 +38,41 @@ h2{font-size:22px}
 .count{color:#766454}
 .hidden{display:none}
 @media(max-width:600px){header .wrap{padding:12px;gap:8px}header img{max-width:240px}.wrap{padding:12px}.login{margin:4vh auto;padding:18px}.images{gap:7px}.order{padding:13px}.actions button{flex:1;min-width:145px}}
+
+.print-calibration{padding:14px;border:1px solid var(--border);background:#fff;border-radius:12px;margin:0 0 20px}
+.print-calibration h3{font-size:19px;margin:0 0 8px}
+.calibration-sides{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0}
+.calibration-sides fieldset{min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;border:1px solid #ded2c3;border-radius:10px;padding:10px}
+.calibration-sides legend{font-size:15px;font-weight:800;padding:0 5px}
+.calibration-sides label{font-size:13px;font-weight:700}
+.calibration-sides input{margin-top:5px;min-height:42px;font-size:16px;padding:8px}
+#calSaved{margin-left:12px}
+@media(max-width:750px){.calibration-sides{grid-template-columns:1fr}}
+@media(max-width:440px){.calibration-sides fieldset{grid-template-columns:1fr}}
 </style></head><body><header><div class="wrap"><div><h1>大相撲安芸場所巡業｜うちわ受付管理</h1><span>表・裏のA4横印刷 ／ 受付・受け渡し</span></div><img src="assets/akibashofilter.png" alt="令和8年 秋巡業 大相撲安芸場所巡業" loading="lazy"></div></header>
 <div class="wrap"><div id="login" class="login"><h2>スタッフログイン</h2><p class="muted">Firebase Authenticationのスタッフ用メールアドレスでログインしてください。安芸場所の注文だけを表示します。閲覧・更新の権限はFirebaseのセキュリティルールでも許可されている必要があります。</p><label>メールアドレス<input id="email" type="email" autocomplete="username"></label><label>パスワード<input id="password" type="password" autocomplete="current-password"></label><p><button type="button" id="loginBtn" class="primary">ログイン</button></p><p id="loginError" class="err"></p></div>
 <div id="dashboard" class="hidden"><div class="toolbar"><div><h2 style="margin:0">注文一覧 <span class="count" id="count"></span></h2><div class="muted">会場ID: <span id="shopName"></span></div></div><div><select id="filter"><option value="ALL">全件</option><option value="WAIT">未印刷</option><option value="READY">印刷済み</option><option value="DONE">受渡済み</option></select> <button id="refresh">再読み込み</button> <button id="logout">ログアウト</button></div></div>
-<div class="help"><b>受渡後の削除：</b>商品をお渡しした後、「受渡済みにする」を押してください。受渡日時を記録します。受渡から24時間経過後の画像・注文情報の自動削除は、<b>Firebase側の削除処理が正しく設定・稼働している場合に限ります。</b>受渡前には押さないでください。<br><b>印刷方法：</b>「表・裏を２ページで印刷」を押すとA4横の２ページが開きます。表と裏を別々に印刷する場合は各ボタンを使用してください。実際の貼り合わせ方向は印刷テストでご確認ください。</div><p id="message" class="err"></p><div id="orders" class="orders"></div></div></div>
+<div class="help"><b>受渡後の削除：</b>商品をお渡しした後、「受渡済みにする」を押してください。受渡日時を記録します。受渡から24時間経過後の画像・注文情報の自動削除は、<b>Firebase側の削除処理が正しく設定・稼働している場合に限ります。</b>受渡前には押さないでください。<br><b>印刷方法：</b>「表・裏を２ページで印刷」を押すとA4横の２ページが開きます。表と裏を別々に印刷する場合は各ボタンを使用してください。実際の貼り合わせ方向は印刷テストでご確認ください。印刷設定は「A4・横・倍率100％・余白なし」を選び、用紙に合わせる自動拡大縮小をOFFにしてください。</div>
+<section class="print-calibration" aria-label="印刷位置調整">
+  <h3>うちわラベルシート用・印刷倍率・位置の補正</h3>
+  <p class="muted">Apeos C4570で普通紙に印刷し、ラベルシートと重ねて位置を確認してください。数値はこのパソコンのブラウザーに保存されます。ZIP内の原寸マスクと実物スキャンを照合済み。画像素材は変更せず、Apeos C4570での実測値に合わせて印刷する画像のみ暫定105.3％に補正します。表裏は別々に位置・倍率を調整できます。</p>
+  <div class="calibration-sides">
+    <fieldset><legend>写真うちわ（表面）</legend>
+      <label>左右位置（mm）<input id="calFrontX" type="number" min="-20" max="20" step="0.5" value="0"></label>
+      <label>上下位置（mm）<input id="calFrontY" type="number" min="-20" max="20" step="0.5" value="0"></label>
+      <label>倍率（％）<input id="calFrontScale" type="number" min="85" max="115" step="0.1" value="105.3"></label>
+    </fieldset>
+    <fieldset><legend>スタンプうちわ（裏面）</legend>
+      <label>左右位置（mm）<input id="calBackX" type="number" min="-20" max="20" step="0.5" value="0"></label>
+      <label>上下位置（mm）<input id="calBackY" type="number" min="-20" max="20" step="0.5" value="0"></label>
+      <label>倍率（％）<input id="calBackScale" type="number" min="85" max="115" step="0.1" value="105.3"></label>
+    </fieldset>
+  </div>
+  <button id="calReset" type="button">位置調整を初期値に戻す</button>
+  <span class="muted" id="calSaved" role="status" aria-live="polite"></span>
+  <p class="muted">左右は＋で右、上下は＋で下へ移動。測定結果「50mm→47.5mm」を補正するため初期倍率は105.3％です。まず移動0mm・105.3％で普通紙に試し刷りし、ラベルに重ねてください。EdgeではA4横・実際のサイズ100％・ヘッダー/フッターOFFを維持してください（この105.3％は印刷データ側だけの補正）。</p>
+</section>
+<p id="message" class="err"></p><div id="orders" class="orders"></div></div></div>
 <script type="module">
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
 import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
@@ -58,5 +89,69 @@ function render(){const area=$('orders');area.replaceChildren();const show=$('fi
 if(!data.length){area.textContent='該当する注文はありません。';return}for(const o of data){const card=document.createElement('article');card.className='order';const top=document.createElement('div');top.className='top';const left=document.createElement('div');const code=document.createElement('div');code.className='code';code.textContent=o.displayCode||o.shortId||o.id;const detail=document.createElement('div');detail.className='muted';detail.textContent=`${o.customerName||'お名前未入力'} ／ ${o.copies||1}本 ／ ${o.dayKey||''}`;left.append(code,detail);if(o.status==='DONE'){const timing=document.createElement('div');timing.className='muted';timing.textContent=o.handedOverAt?.toDate?'受渡登録：'+o.handedOverAt.toDate().toLocaleString('ja-JP')+' ／ 24時間後を過ぎると自動削除':'受渡日時が未登録です（削除対象になりません）';left.append(timing)}const status=document.createElement('span');status.className='status';status.textContent=({WAIT:'未印刷',READY:'印刷済',DONE:'受渡済'})[o.status]||o.status||'受付済';top.append(left,status);card.append(top);
 const figs=document.createElement('div');figs.className='images';for(const [which,url] of [['表面',o.frontImageUrl||o.imageUrl],['裏面',o.backImageUrl]]){const f=document.createElement('figure');const img=document.createElement('img');if(url){img.src=url;img.alt=which}else img.alt=which+'画像なし';img.loading='lazy';const cap=document.createElement('figcaption');cap.textContent=which;f.append(img,cap);figs.append(f)}card.append(figs);
 const actions=document.createElement('div');actions.className='actions';for(const [label,sides] of [['表・裏を２ページで印刷',['front','back']],['表面だけ印刷',['front']],['裏面だけ印刷',['back']]]){const b=document.createElement('button');b.textContent=label;b.disabled=sides.some(v=>!(v==='front'?(o.frontImageUrl||o.imageUrl):o.backImageUrl));b.onclick=()=>printOrder(o,sides);actions.append(b)}if(o.status!=='DONE')for(const [label,value] of [['印刷済みにする','READY'],['受渡済みにする','DONE']]){if(value==='READY'&&o.status==='READY')continue;const b=document.createElement('button');b.textContent=label;if(value==='DONE')b.classList.add('primary');b.onclick=async()=>{if(value==='DONE'&&!confirm('この商品をお客様にお渡ししましたか？\n「OK」を押した時刻から24時間後、表裏の写真と注文情報が自動削除の対象になります。\n※受渡前は押さないでください。'))return;b.disabled=true;try{const payload={status:value,updatedAt:serverTimestamp()};if(value==='DONE')payload.handedOverAt=serverTimestamp();await updateDoc(doc(db,'orders',o.id),payload);await loadOrders();}catch(e){$('message').textContent='状態更新に失敗しました。'+e.message}finally{b.disabled=false}};actions.append(b)}if(o.status==='DONE'&&!o.handedOverAt){const b=document.createElement('button');b.textContent='受渡日時を今から登録';b.className='primary';b.onclick=async()=>{if(!confirm('この注文は以前から受渡済みですが日時がありません。\n今から24時間の削除期限を設定してよろしいですか？'))return;b.disabled=true;try{await updateDoc(doc(db,'orders',o.id),{handedOverAt:serverTimestamp(),updatedAt:serverTimestamp()});await loadOrders()}catch(e){$('message').textContent='日時登録に失敗しました。'+e.message}finally{b.disabled=false}};actions.append(b)}card.append(actions);area.append(card)}}
-function printOrder(o,sides){const w=window.open('','_blank');if(!w){alert('ポップアップを許可してください。');return}const images=sides.map(side=>({name:side==='front'?'表面':'裏面',url:side==='front'?(o.frontImageUrl||o.imageUrl):o.backImageUrl}));const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));w.document.open();w.document.write(`<!DOCTYPE html><html lang="ja"><head><title>${esc(o.displayCode||o.id)} - 印刷</title><style>@page{size:A4 landscape;margin:0}html,body{margin:0;padding:0;background:white}.page{display:block;width:100%;margin:0;padding:0;break-inside:avoid;page-break-inside:avoid}.page+.page{break-before:page;page-break-before:always}.page img{display:block;width:96%;max-width:100%;height:auto;object-fit:contain;margin:0 auto}@media screen{body{background:#ddd}.page{width:297mm;min-height:210mm;background:white;margin:8mm auto;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px #999}.page img{width:96%}}</style></head><body>${images.map(x=>`<section class="page"><img src="${esc(x.url)}" alt="${x.name}"></section>`).join('')}<script>Promise.all(Array.from(document.images).map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve}))).then(()=>setTimeout(()=>window.print(),400));<\/script></body></html>`);w.document.close()}
+
+// 印刷位置の調整値はこの端末内のみ保存。Firebaseの注文データは変更しない。
+const CAL_KEY = 'aki-basho-print-calibration-v3-1053';
+const defaultCal = () => ({front:{x:0,y:0,scale:105.3},back:{x:0,y:0,scale:105.3}});
+let printCal = defaultCal();
+const clampCal = (value,min,max,fallback) => {const n=Number(value);return Number.isFinite(n)?Math.min(max,Math.max(min,n)):fallback;};
+function loadCal(){
+  try {const saved=JSON.parse(localStorage.getItem(CAL_KEY)||'null');
+    for(const side of ['front','back']) if(saved && saved[side]) {
+      printCal[side].x=clampCal(saved[side].x,-20,20,0);
+      printCal[side].y=clampCal(saved[side].y,-20,20,0);
+      printCal[side].scale=clampCal(saved[side].scale,85,115,100);
+    }
+  } catch(e){console.warn('印刷位置設定を読み込めませんでした',e)}
+  updateCalInputs();
+}
+function updateCalInputs(){
+  for(const side of ['front','back']){
+    const prefix=side==='front'?'calFront':'calBack';
+    for(const [prop,field] of [['x','X'],['y','Y'],['scale','Scale']]) $(prefix+field).value=String(printCal[side][prop]);
+  }
+}
+function wireCal(){
+  loadCal();
+  for(const side of ['front','back']){
+    const prefix=side==='front'?'calFront':'calBack';
+    for(const [prop,field,min,max] of [['x','X',-20,20],['y','Y',-20,20],['scale','Scale',85,115]]) {
+      const input=$(prefix+field);
+      input.addEventListener('change',()=>{
+        printCal[side][prop]=clampCal(input.value,min,max,prop==='scale'?105.3:0);
+        updateCalInputs();
+        try{localStorage.setItem(CAL_KEY,JSON.stringify(printCal));$('calSaved').textContent='保存しました'}
+        catch(e){$('calSaved').textContent='保存できませんでした（印刷には適用されます）'}
+      });
+    }
+  }
+  $('calReset').onclick=()=>{printCal=defaultCal();updateCalInputs();try{localStorage.removeItem(CAL_KEY)}catch(e){} $('calSaved').textContent='初期値に戻しました';};
+}
+wireCal();
+
+function printOrder(o,sides){
+  const w=window.open('','_blank');
+  if(!w){alert('ポップアップを許可してください。');return}
+  const images=sides.map(side=>({
+    side,
+    name:side==='front'?'表面':'裏面',
+    url:side==='front'?(o.frontImageUrl||o.imageUrl):o.backImageUrl,
+    x:printCal[side].x,y:printCal[side].y,scale:printCal[side].scale/100
+  }));
+  const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  // img は絶対配置のためレイアウト上の高さを持たない。
+  // 版下の基準はA4原寸297x210mm。デバイスの95%縮小に対して中心基準で画像だけ105.3%に補正。
+  // 各ページ枠は209mmにして改ページ由来の白紙を抑制（うちわ外周は下端より十分内側）。
+  const sheet=images.map(x=>`<section class="page"><img class="sheet-art" src="${esc(x.url)}" alt="${esc(x.name)}" style="left:calc(148.5mm + ${x.x}mm);top:calc(105mm + ${x.y}mm);transform:translate(-50%,-50%) scale(${x.scale});"></section>`).join('');
+  w.document.open();
+  w.document.write(`<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title>${esc(o.displayCode||o.id)} - 印刷</title>
+<style>@page{size:A4 landscape;margin:0}
+html,body{margin:0;padding:0;background:white}
+.page{display:block;width:100%;height:209mm;overflow:hidden;position:relative;break-inside:avoid;page-break-inside:avoid}
+.page+.page{break-before:page;page-break-before:always}
+.sheet-art{position:absolute;display:block;width:297mm;height:210mm;max-width:none;transform-origin:center center;object-fit:fill}
+@media screen{body{background:#ddd}.page{width:297mm;margin:8mm auto;background:#fff;box-shadow:0 0 8px #aaa}}
+</style></head><body>${sheet}<script>Promise.all(Array.from(document.images).map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve}))).then(()=>setTimeout(()=>window.print(),400));<\/script></body></html>`);
+  w.document.close();
+}
 </script></body></html>
