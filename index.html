@@ -446,8 +446,33 @@ async function toPngBlob(c){ return await new Promise((resolve,reject)=>c.toBlob
 function status(s,kind=''){ const x=el('orderStatus'); x.textContent=s; x.className='status '+kind; }
 const queryParams=new URLSearchParams(location.search); const shopId=(queryParams.get('shop')||'aki-basho').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,40)||'aki-basho';
 const firebaseConfig={apiKey:'AIzaSyBKSYZgaSVTu-HO_lS1Tp2eFjSjMuOONNI',authDomain:'my-uchiwa-queue.firebaseapp.com',projectId:'my-uchiwa-queue',storageBucket:'my-uchiwa-queue.firebasestorage.app',messagingSenderId:'245883628081',appId:'1:245883628081:web:ab7f00f01ba256ebca8310'};
-let firebase=null;
-async function getFirebase(){ if(firebase)return firebase; const [appmod,fs,st]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js'), import('https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js'), import('https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js')]); const app=appmod.getApps().length?appmod.getApp():appmod.initializeApp(firebaseConfig); firebase={db:fs.getFirestore(app),storage:st.getStorage(app),fs,st}; return firebase; }
+// お客様用の匿名ログインは管理画面のメールアドレス認証と別名のFirebase Appに分離する。
+// 同じ端末で受付管理画面にログインしても、注文者の匿名UIDが上書きされない。
+let firebase=null, firebaseInitPromise=null;
+async function getFirebase(){
+  if(firebase)return firebase;
+  if(firebaseInitPromise)return firebaseInitPromise;
+  firebaseInitPromise=(async()=>{
+    const [appmod,fs,st,au]=await Promise.all([
+      import('https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js'),
+      import('https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js'),
+      import('https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js')
+    ]);
+    const appName='aki-basho-customer';
+    const app=appmod.getApps().find(x=>x.name===appName)||appmod.initializeApp(firebaseConfig,appName);
+    const auth=au.getAuth(app);
+    await timeout(auth.authStateReady(),15000,'認証状態の確認');
+    let user=auth.currentUser;
+    if(!user || !user.isAnonymous){
+      user=(await timeout(au.signInAnonymously(auth),30000,'匿名ログイン')).user;
+    }
+    firebase={db:fs.getFirestore(app),storage:st.getStorage(app),fs,st,auth,uid:user.uid};
+    return firebase;
+  })();
+  try{return await firebaseInitPromise;}
+  finally{firebaseInitPromise=null;}
+}
 function dayKey(){ const d=new Date(); return [String(d.getFullYear()).slice(-2), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join(''); }
 function timeout(p,ms,name){ return Promise.race([p,new Promise((_,reject)=>setTimeout(()=>reject(new Error(name+'が時間切れです。通信状況を確認してください。')),ms))]); }
 
@@ -522,7 +547,7 @@ async function sendOrder(){
   setSending(true);const btn=el('orderBtn');btn.textContent='注文データを送信中…';el('complete').style.display='none';
   try{
     const signature=await fingerprint();
-    const {db,storage,fs,st}=await getFirebase();
+    const {db,storage,fs,st,uid}=await getFirebase();
     let p=pendingOrder;
     if(p){
       const existing=await readExistingOrder(db,fs,p);
@@ -532,7 +557,7 @@ async function sendOrder(){
     }else{
       status('受付番号を発行しています…');
       const date=dayKey(),counterRef=fs.doc(db,'counters',shopId+'_'+date);
-      const serial=await timeout(fs.runTransaction(db,async tx=>{const snap=await tx.get(counterRef),n=(snap.exists()?Number(snap.data().lastNumber)||0:0)+1;tx.set(counterRef,{shopId,dayKey:date,lastNumber:n,updatedAt:fs.serverTimestamp()},{merge:true});return n;}),30000,'受付番号発行');
+      const serial=await timeout(fs.runTransaction(db,async tx=>{const snap=await tx.get(counterRef),n=(snap.exists()?Number(snap.data().lastNumber)||0:0)+1;tx.set(counterRef,{shopId,dayKey:date,service:'aki-basho-double-fan',lastNumber:n,updatedAt:fs.serverTimestamp()},{merge:true});return n;}),30000,'受付番号発行');
       const shortId=String(serial).padStart(4,'0'),queueId=shopId+'-'+date+'-'+shortId,displayCode='AK'+date.slice(2)+'-'+shortId;
       p={shopId,date,queueId,displayCode,shortId,serial,signature,createdAt:Date.now()};
       storePending(p);showRecovery();
@@ -544,11 +569,11 @@ async function sendOrder(){
     status('表面の写真を送信しています…');const fr=st.ref(storage,frontPath);await timeout(st.uploadBytes(fr,fblob,{contentType:'image/png'}),90000,'表面の送信');const imageUrl=await timeout(st.getDownloadURL(fr),15000,'表面URL取得');
     status('裏面のスタンプを送信しています…');const br=st.ref(storage,backPath);await timeout(st.uploadBytes(br,bblob,{contentType:'image/png'}),90000,'裏面の送信');const backImageUrl=await timeout(st.getDownloadURL(br),15000,'裏面URL取得');
     status('注文を確定しています…');const orderRef=fs.doc(db,'orders',p.queueId);
-    const orderData={source:'aki-basho-double-fan',productType:'double-sided-fan',doubleSided:true,queueId:p.queueId,shortId:p.shortId,displayNo:p.serial,displayCode:p.displayCode,shopId,shopName:'大相撲安芸場所巡業',shopCode:'AK',dayKey:p.date,customerName:el('customerName').value.trim(),copies:Number(el('copies').value),imageUrl,frontImageUrl:imageUrl,backImageUrl,storagePath:frontPath,backStoragePath:backPath,template:'aki-front',backTemplate:'aki-back',stampCount:1,priceType:'event',unitPrice:null,totalPrice:null,status:'WAIT',retentionPolicy:'pickup-plus-24h',createdAt:fs.serverTimestamp(),updatedAt:fs.serverTimestamp()};
+    const orderData={ownerUid:uid,source:'aki-basho-double-fan',productType:'double-sided-fan',doubleSided:true,queueId:p.queueId,shortId:p.shortId,displayNo:p.serial,displayCode:p.displayCode,shopId,shopName:'大相撲安芸場所巡業',shopCode:'AK',dayKey:p.date,customerName:el('customerName').value.trim(),copies:Number(el('copies').value),imageUrl,frontImageUrl:imageUrl,backImageUrl,storagePath:frontPath,backStoragePath:backPath,template:'aki-front',backTemplate:'aki-back',stampCount:1,priceType:'event',unitPrice:null,totalPrice:null,status:'WAIT',retentionPolicy:'pickup-plus-24h',createdAt:fs.serverTimestamp(),updatedAt:fs.serverTimestamp()};
     await timeout(fs.setDoc(orderRef,orderData),30000,'注文確定');
     finishOrder(p);
   }catch(e){
-    console.error(e);const explanation=e.code==='permission-denied'?'Firebaseの権限設定により送信できません。管理者にご連絡ください。':e.message||'通信エラーが発生しました。';
+    console.error(e);const explanation=e.code==='permission-denied'?'Firebaseのセキュリティルールにより拒否されました。FirestoreとStorageのルールを確認してください。':e.code==='auth/operation-not-allowed'?'Firebase Authenticationで「匿名」ログインを有効にしてください。':e.message||'通信エラーが発生しました。';
     status('注文の完了を確認できませんでした。\n'+explanation+'\n'+(pendingOrder?'受付番号 '+pendingOrder.displayCode+' を管理画面で確認してください。確認せずに新規注文を作らないでください。':'再試行してください。'),'error');
   }finally{
     setSending(false);btn.textContent=orderFinalized?'注文確定済み':pendingOrder?'注文を再確認・送信する':'注文を確定する';
