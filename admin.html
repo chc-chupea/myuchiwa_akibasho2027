@@ -148,13 +148,16 @@ function printOrder(o,sides){
   /* A4そのものをページサイズとし、ブラウザー側の印刷余白を排除する。 */
   @page{size:A4 landscape;margin:0}
   *{box-sizing:border-box}
-  html,body{width:297mm;margin:0;padding:0;background:#fff}
-  /* ページ末尾に余裕を残す。画像は絶対配置で原寸を維持するため、
-     改ページ位置の丸め誤差による空白ページを発生させない。 */
-  .page{position:relative;width:297mm;height:208mm;margin:0;padding:0;border:0;overflow:visible;break-inside:avoid;page-break-inside:avoid}
-  /* 2ページ目以降の「開始時」だけ明示的に改ページする。最終ページの後ろには何も追加しない。 */
+  /* 印刷ルートは紙面より0.3mm狭くする。端数丸めによる幅方向の余計なページを防ぐ。 */
+  html,body{width:296.7mm;max-width:296.7mm;margin:0;padding:0;background:#fff}
+  /* 重要: 旧版では高さ208mmの要素から高さ209mmの画像がはみ出し、
+     印刷プレビューに空白の次ページが生成されていた。
+     うちわの輪郭は用紙の約203mmまでであり、以下の204.5mm枠に完全に収まる。
+     画像そのものの105.3%・座標・mm指定は変更せず、紙面下端の白部分だけをclipする。 */
+  .page{position:relative;width:296.7mm;height:204.5mm;margin:0;padding:0;border:0;overflow:hidden;break-inside:avoid;page-break-inside:avoid}
+  /* 先頭以外の印刷ページのみ区切る。最後のページ後にbreakを追加しない。 */
   .page + .page{break-before:page;page-break-before:always}
-  /* 以前と同じ絶対位置・印刷サイズ（左0.675mm、上0.5mm、幅295.65mm、高さ209mm）。 */
+  /* 紙面上の位置・原寸は前版から一切変更しない。 */
   .sheet-art{position:absolute;left:0.675mm;top:0.5mm;display:block;width:295.65mm;height:209mm;max-width:none}
   #printError{display:none;color:#a22;font-size:16px;font-weight:bold;padding:12px}
   @media screen{body{background:#ddd;padding:10px 0}.page{background:white;margin:8mm auto;box-shadow:0 0 8px #aaa}#printError{background:white;max-width:297mm;margin:auto}}
